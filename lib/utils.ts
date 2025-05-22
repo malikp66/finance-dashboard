@@ -1,6 +1,7 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { eachDayOfInterval, format, isSameDay, subDays } from "date-fns";
+import { id } from "date-fns/locale";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -15,10 +16,10 @@ export function convertAmountToMilliunits(amount: number) {
 }
 
 export function formatCurrency(value: number) {
-  return Intl.NumberFormat("en-us", {
+  return Intl.NumberFormat("id-ID", {
     style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 2,
+    currency: "IDR",
+    minimumFractionDigits: 0, // Biasanya Rupiah tidak pakai desimal
   }).format(value);
 }
 
@@ -72,31 +73,34 @@ export function formatDateRange(period?: Period) {
   const defaultFrom = subDays(defaultTo, 30);
 
   if (!period?.from) {
-    return `${format(defaultFrom, "LLL dd")} - ${format(
+    return `${format(defaultFrom, "d MMM", { locale: id })} - ${format(
       defaultTo,
-      "LLL dd, y"
+      "d MMM yyyy",
+      { locale: id }
     )}`;
   }
 
   if (period?.to) {
-    return `${format(period.from, "LLL dd")} - ${format(
-      period.to,
-      "LLL dd, y"
+    return `${format(new Date(period.from), "d MMM", { locale: id })} - ${format(
+      new Date(period.to),
+      "d MMM yyyy",
+      { locale: id }
     )}`;
   }
 
-  return format(period.from, "LLL dd, y");
+  return format(new Date(period.from), "d MMM yyyy", { locale: id });
 }
 
 export function formatPercentage(
   value: number,
   options: { addPrefix?: boolean } = { addPrefix: false }
 ) {
-  const result = new Intl.NumberFormat("en-US", {
-    style: "percent",
-  }).format(value / 100);
+  const formatted = new Intl.NumberFormat("id-ID", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value) + "%";
 
-  if (options.addPrefix && value > 0) return `+${result}`;
+  if (options.addPrefix && value > 0) return `+${formatted}`;
 
-  return result;
+  return formatted;
 }

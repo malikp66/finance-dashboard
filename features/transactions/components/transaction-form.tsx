@@ -158,12 +158,12 @@ export const TransactionForm = ({
           disabled={disabled}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Payee</FormLabel>
+              <FormLabel>Penerima Pembayaran</FormLabel>
 
               <FormControl>
                 <Input
                   disabled={disabled}
-                  placeholder="Add a payee"
+                  placeholder="Tambahkan nama penerima"
                   {...field}
                 />
               </FormControl>
