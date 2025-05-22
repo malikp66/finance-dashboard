@@ -22,7 +22,7 @@ export const AmountInput = ({
   placeholder,
   disabled,
 }: AmountInputProps) => {
-  const parsedValue = parseFloat(value);
+  const parsedValue = parseFloat(value || "0");
   const isIncome = parsedValue > 0;
   const isExpense = parsedValue < 0;
 
@@ -54,25 +54,27 @@ export const AmountInput = ({
           </TooltipTrigger>
 
           <TooltipContent>
-            Use [+] for income and [-] for expenses
+            Gunakan [+] untuk pemasukan dan [-] untuk pengeluaran
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
 
       <CurrencyInput
-        prefix="$"
-        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 pl-10 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+        prefix="Rp "
+        groupSeparator="."
+        decimalSeparator=","
+        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 pl-14 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
         placeholder={placeholder}
         value={value}
-        decimalScale={2}
-        decimalsLimit={2}
+        decimalScale={0}
+        decimalsLimit={0}
         onValueChange={onChange}
         disabled={disabled}
       />
 
       <p className="mt-2 text-xs text-muted-foreground">
-        {isIncome && "This will count as an income."}
-        {isExpense && "This will count as an expense."}
+        {isIncome && "Ini akan dihitung sebagai pemasukan."}
+        {isExpense && "Ini akan dihitung sebagai pengeluaran."}
       </p>
     </div>
   );
