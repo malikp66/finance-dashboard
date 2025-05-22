@@ -7,7 +7,9 @@ import { convertAmountToMilliunits } from "@/lib/utils";
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false },
+  ssl: {
+    rejectUnauthorized: false, // 🚨 Disable strict cert validation (only for development)
+  },
 });
 
 const db = drizzle(pool);
