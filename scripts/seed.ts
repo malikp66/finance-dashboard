@@ -1,18 +1,12 @@
-import { Pool } from "pg";
+import { neon } from "@neondatabase/serverless";
 import { eachDayOfInterval, format, subDays } from "date-fns";
-import { drizzle } from "drizzle-orm/node-postgres";
+import { drizzle } from "drizzle-orm/neon-http";
 
 import { accounts, categories, transactions } from "@/db/schema";
 import { convertAmountToMilliunits } from "@/lib/utils";
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false, // 🚨 Disable strict cert validation (only for development)
-  },
-});
-
-const db = drizzle(pool);
+const sql = neon(process.env.DATABASE_URL!);
+const db = drizzle(sql);
 
 const SEED_USER_ID = "user_2gIujdiMTbMqEMKu0iUjgYUmox1";
 const SEED_CATEGORIES = [

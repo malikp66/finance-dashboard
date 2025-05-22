@@ -134,7 +134,6 @@
     "eslint": "^8",
     "eslint-config-next": "14.2.3",
     "eslint-plugin-unused-imports": "^3.2.0",
-    "pg": "^8.16.0",
     "postcss": "^8",
     "prettier": "^3.2.5",
     "prettier-plugin-tailwindcss": "^0.5.14",
