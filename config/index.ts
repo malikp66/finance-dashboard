@@ -45,11 +45,11 @@ export const siteConfig: Metadata = {
     "css",
   ] as Array<string>,
   authors: {
-    name: "Sanidhya Kumar Verma",
-    url: "https://github.com/sanidhyy",
+    name: "Mochammad Malik Putra Kurniawan",
+    url: "https://github.com/malikp66",
   },
 } as const;
 
 export const links = {
-  sourceCode: "https://github.com/sanidhyy/finance-dashboard",
+  sourceCode: "https://github.com/malikp66/finance-dashboard",
 } as const;
