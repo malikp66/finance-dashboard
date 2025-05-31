@@ -11,7 +11,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { client } from "@/lib/hono";
 import { formatCurrency } from "@/lib/utils";
 
-import { AccountColumn } from "./account-column";
 import { Actions } from "./actions";
 import { CategoryColumn } from "./category-column";
 
