@@ -24,7 +24,7 @@ type SpendingPieProps = {
 
 export const SpendingPie = ({ data = [] }: SpendingPieProps) => {
   type ChartType = "pie" | "radar" | "radial";
-  const [chartType, setChartType] = useState<ChartType>("pie");
+  const [chartType, setChartType] = useState<ChartType>("radial");
 
   const onTypeChange = (type: ChartType) => {
     setChartType(type);

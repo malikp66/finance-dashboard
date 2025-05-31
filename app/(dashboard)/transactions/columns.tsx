@@ -126,27 +126,52 @@ export const columns: ColumnDef<ResponseType>[] = [
     },
   },
   {
-    accessorKey: "account",
+    accessorKey: "notes",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Account
+          Notes
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
     cell: ({ row }) => {
+      const notes: string = row.getValue("notes");
+
       return (
-        <AccountColumn
-          account={row.original.account}
-          accountId={row.original.accountId}
-        />
+        <p
+          className="text-sm font-medium"
+        >
+          {notes}
+        </p>
       );
     },
   },
+  // {
+  //   accessorKey: "account",
+  //   header: ({ column }) => {
+  //     return (
+  //       <Button
+  //         variant="ghost"
+  //         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+  //       >
+  //         Account
+  //         <ArrowUpDown className="ml-2 h-4 w-4" />
+  //       </Button>
+  //     );
+  //   },
+  //   cell: ({ row }) => {
+  //     return (
+  //       <AccountColumn
+  //         account={row.original.account}
+  //         accountId={row.original.accountId}
+  //       />
+  //     );
+  //   },
+  // },
   {
     id: "actions",
     cell: ({ row }) => <Actions id={row.original.id} />,
