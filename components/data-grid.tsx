@@ -2,7 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import { FaPiggyBank } from "react-icons/fa";
-import { FaArrowTrendUp, FaArrowTrendDown } from "react-icons/fa6";
+import { FaArrowTrendUp, FaArrowTrendDown, FaWallet } from "react-icons/fa6";
 
 import { useGetSummary } from "@/features/summary/api/use-get-summary";
 import { formatDateRange } from "@/lib/utils";
@@ -14,20 +14,24 @@ export const DataGrid = () => {
   const searchParams = useSearchParams();
   const to = searchParams.get("to") || undefined;
   const from = searchParams.get("from") || undefined;
+  const categoryId = searchParams.get("categoryId") || "all";
+
+  const gridCols = categoryId !== "all" ? "lg:grid-cols-4" : "lg:grid-cols-3";
 
   const dateRangeLabel = formatDateRange({ to, from });
 
   if (isLoading)
     return (
-      <div className="mb-8 grid grid-cols-1 gap-8 pb-2 lg:grid-cols-3">
+      <div className={`mb-8 grid grid-cols-1 gap-8 pb-2 ${gridCols}`}>
         <DataCardLoading />
+        {categoryId !== "all" && <DataCardLoading />}
         <DataCardLoading />
         <DataCardLoading />
       </div>
     );
 
   return (
-    <div className="mb-8 grid grid-cols-1 gap-8 pb-2 lg:grid-cols-3">
+    <div className={`mb-8 grid grid-cols-1 gap-8 pb-2 ${gridCols}`}>
       <DataCard
         title="Balance"
         value={data?.remainingAmount}
@@ -36,6 +40,16 @@ export const DataGrid = () => {
         variant="default"
         dateRange={dateRangeLabel}
       />
+
+      {categoryId !== "all" && (
+        <DataCard
+          title="Category Balance"
+          value={data?.categoryBalance}
+          icon={FaWallet}
+          variant="warning"
+          dateRange={dateRangeLabel}
+        />
+      )}
 
       <DataCard
         title="Total Income"

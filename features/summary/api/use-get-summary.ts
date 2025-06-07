@@ -32,6 +32,7 @@ export const useGetSummary = () => {
         incomeAmount: convertAmountFromMilliunits(data.incomeAmount),
         expensesAmount: convertAmountFromMilliunits(data.expensesAmount),
         remainingAmount: convertAmountFromMilliunits(data.remainingAmount),
+        categoryBalance: convertAmountFromMilliunits(data.categoryBalance),
         categories: data.categories.map((category) => ({
           ...category,
           value: convertAmountFromMilliunits(category.value),

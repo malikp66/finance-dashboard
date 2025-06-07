@@ -57,6 +57,7 @@ const app = new Hono().get(
               Number
             ),
           remaining: sum(transactions.amount).mapWith(Number),
+          categoryBalance: sql`SUM(${transactions.amount})`.mapWith(Number),
         })
         .from(transactions)
         .innerJoin(accounts, eq(transactions.accountId, accounts.id))
@@ -161,6 +162,7 @@ const app = new Hono().get(
     return ctx.json({
       data: {
         remainingAmount: currentPeriod.remaining,
+        categoryBalance: currentPeriod.categoryBalance,
         remainingChange,
         incomeAmount: currentPeriod.income,
         incomeChange,
