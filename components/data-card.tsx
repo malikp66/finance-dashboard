@@ -65,7 +65,7 @@ export const DataCard = ({
 }: DataCardProps) => {
   return (
     <div className="relative">
-      {action && <div className="absolute right-2 top-2">{action}</div>}
+      {action && <div className="">{action}</div>}
       <Card className="border-none drop-shadow-sm">
         <CardHeader className="flex flex-row items-center justify-between gap-x-4">
           <div className="space-y-2">

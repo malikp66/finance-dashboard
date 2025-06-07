@@ -45,9 +45,6 @@ export const DataGrid = () => {
         icon={FaArrowTrendUp}
         variant="success"
         dateRange={dateRangeLabel}
-        action={
-          <CategoryFilter className="h-7 rounded-md border-none bg-white/10 px-2 text-xs font-normal text-white outline-none transition hover:bg-white/30 hover:text-white focus:bg-white/30 focus:ring-transparent focus:ring-offset-0" />
-        }
       />
 
       <DataCard
@@ -57,9 +54,6 @@ export const DataGrid = () => {
         icon={FaArrowTrendDown}
         variant="danger"
         dateRange={dateRangeLabel}
-        action={
-          <CategoryFilter className="h-7 rounded-md border-none bg-white/10 px-2 text-xs font-normal text-white outline-none transition hover:bg-white/30 hover:text-white focus:bg-white/30 focus:ring-transparent focus:ring-offset-0" />
-        }
       />
     </div>
   );

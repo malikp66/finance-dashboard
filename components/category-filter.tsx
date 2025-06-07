@@ -64,7 +64,7 @@ export const CategoryFilter = ({ className }: CategoryFilterProps) => {
       <SelectTrigger
         className={
           className ||
-          "h-7 rounded-md border-none bg-white/10 px-2 text-xs font-normal text-white outline-none transition hover:bg-white/30 hover:text-white focus:bg-white/30 focus:ring-transparent focus:ring-offset-0"
+          "h-9 w-full rounded-md border-none bg-white/10 px-3 font-normal text-white outline-none transition hover:bg-white/30 hover:text-white focus:bg-white/30 focus:ring-transparent focus:ring-offset-0 lg:w-auto"
         }
       >
         <SelectValue placeholder="Select category" />
