@@ -15,30 +15,33 @@ export const DataGrid = () => {
   const to = searchParams.get("to") || undefined;
   const from = searchParams.get("from") || undefined;
   const categoryId = searchParams.get("categoryId") || "all";
-
   const hasInvestment = data?.hasInvestmentCategory;
-  const gridCols = categoryId !== "all"
-    ? hasInvestment
-      ? "lg:grid-cols-5"
-      : "lg:grid-cols-4"
-    : hasInvestment
-    ? "lg:grid-cols-4"
-    : "lg:grid-cols-3";
+
+  // Perhitungan jumlah card yang AKTIF
+  let cardCount = 0;
+  if (categoryId === "all") cardCount++;
+  if (hasInvestment) cardCount++;
+  if (categoryId !== "all") cardCount++;
+  if (categoryId !== "Pribadi") cardCount++;
+  if (categoryId !== "Investasi") cardCount++;
+
+  // Atur grid cols sesuai jumlah card
+  // Responsive: 1 untuk mobile, 2 untuk md, ... cardCount untuk lg
+  const gridCols = `grid-cols-1 md:grid-cols-2 lg:grid-cols-${cardCount}`;
 
   const dateRangeLabel = formatDateRange({ to, from });
 
   if (isLoading)
     return (
-      <div className={`mb-8 grid grid-cols-1 gap-8 pb-2 ${gridCols}`}>
-        <DataCardLoading />
-        {categoryId !== "all" && <DataCardLoading />}
-        <DataCardLoading />
-        <DataCardLoading />
+      <div className={`mb-8 grid ${gridCols} gap-8 pb-2`}>
+        {[...Array(cardCount)].map((_, i) => (
+          <DataCardLoading key={i} />
+        ))}
       </div>
     );
 
   return (
-    <div className={`mb-8 grid grid-cols-1 gap-8 pb-2 ${gridCols}`}>
+    <div className={`mb-8 grid ${gridCols} gap-8 pb-2`}>
       {categoryId === "all" && (
         <DataCard
           title="Balance"
@@ -49,7 +52,6 @@ export const DataGrid = () => {
           dateRange={dateRangeLabel}
         />
       )}
-
       {hasInvestment && (
         <DataCard
           title="Total Investment"
@@ -60,7 +62,6 @@ export const DataGrid = () => {
           dateRange={dateRangeLabel}
         />
       )}
-
       {categoryId !== "all" && (
         <DataCard
           title="Category Balance"
@@ -70,8 +71,7 @@ export const DataGrid = () => {
           dateRange={dateRangeLabel}
         />
       )}
-
-      {!hasInvestment && (
+      {categoryId !== "Pribadi" && (
         <DataCard
           title="Total Income"
           value={data?.incomeAmount}
@@ -81,8 +81,7 @@ export const DataGrid = () => {
           dateRange={dateRangeLabel}
         />
       )}
-
-      {categoryId !== "investasi" && (
+      {categoryId !== "Investasi" && (
         <DataCard
           title="Total Expenses"
           value={data?.expensesAmount}
