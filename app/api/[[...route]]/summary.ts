@@ -18,11 +18,12 @@ const app = new Hono().get(
       from: z.string().optional(),
       to: z.string().optional(),
       accountId: z.string().optional(),
+      categoryId: z.string().optional(),
     })
   ),
   async (ctx) => {
     const auth = getAuth(ctx);
-    const { from, to, accountId } = ctx.req.valid("query");
+    const { from, to, accountId, categoryId } = ctx.req.valid("query");
 
     if (!auth?.userId) {
       return ctx.json({ error: "Unauthorized." }, 401);
@@ -62,6 +63,7 @@ const app = new Hono().get(
         .where(
           and(
             accountId ? eq(transactions.accountId, accountId) : undefined,
+            categoryId ? eq(transactions.categoryId, categoryId) : undefined,
             eq(accounts.userId, userId),
             gte(transactions.date, startDate),
             lte(transactions.date, endDate)
@@ -106,6 +108,7 @@ const app = new Hono().get(
       .where(
         and(
           accountId ? eq(transactions.accountId, accountId) : undefined,
+          categoryId ? eq(transactions.categoryId, categoryId) : undefined,
           eq(accounts.userId, auth.userId),
           lt(transactions.amount, 0),
           gte(transactions.date, startDate),
@@ -144,6 +147,7 @@ const app = new Hono().get(
       .where(
         and(
           accountId ? eq(transactions.accountId, accountId) : undefined,
+          categoryId ? eq(transactions.categoryId, categoryId) : undefined,
           eq(accounts.userId, auth.userId),
           gte(transactions.date, startDate),
           lte(transactions.date, endDate)
