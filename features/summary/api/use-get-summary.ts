@@ -10,10 +10,9 @@ export const useGetSummary = () => {
   const to = searchParams.get("to") || "";
   const accountId = searchParams.get("accountId") || "";
   const categoryId = searchParams.get("categoryId") || "";
-  const companyMode = searchParams.get("companyMode") || "";
 
   const query = useQuery({
-    queryKey: ["summary", { from, to, accountId, categoryId, companyMode }],
+    queryKey: ["summary", { from, to, accountId, categoryId }],
     queryFn: async () => {
       const response = await client.api.summary.$get({
         query: {
@@ -21,7 +20,6 @@ export const useGetSummary = () => {
           to,
           accountId,
           categoryId,
-          companyMode,
         },
       });
 
@@ -34,7 +32,12 @@ export const useGetSummary = () => {
         incomeAmount: convertAmountFromMilliunits(data.incomeAmount),
         expensesAmount: convertAmountFromMilliunits(data.expensesAmount),
         remainingAmount: convertAmountFromMilliunits(data.remainingAmount),
+        investmentAmount: convertAmountFromMilliunits(
+          data.investmentAmount ?? 0
+        ),
+        investmentChange: data.investmentChange,
         categoryBalance: convertAmountFromMilliunits(data.categoryBalance),
+        hasInvestmentCategory: data.hasInvestmentCategory,
         categories: data.categories.map((category) => ({
           ...category,
           value: convertAmountFromMilliunits(category.value),

@@ -19,13 +19,11 @@ const app = new Hono().get(
       to: z.string().optional(),
       accountId: z.string().optional(),
       categoryId: z.string().optional(),
-      companyMode: z.string().optional(),
     })
   ),
   async (ctx) => {
     const auth = getAuth(ctx);
-    const { from, to, accountId, categoryId, companyMode } = ctx.req.valid("query");
-    const isCompanyMode = companyMode === "true";
+    const { from, to, accountId, categoryId } = ctx.req.valid("query");
 
     if (!auth?.userId) {
       return ctx.json({ error: "Unauthorized." }, 401);
@@ -43,31 +41,20 @@ const app = new Hono().get(
     const lastPeriodStart = subDays(startDate, periodLength);
     const lastPeriodEnd = subDays(endDate, periodLength);
 
-    let investmentCategoryId: string | undefined;
-    if (isCompanyMode) {
-      const investment = await db
-        .select({ id: categories.id })
-        .from(categories)
-        .where(
-          and(eq(categories.userId, auth.userId), eq(categories.name, "Investasi"))
-        )
-        .limit(1);
-      investmentCategoryId = investment[0]?.id;
-    }
+    const investmentCategory = await db
+      .select({ id: categories.id })
+      .from(categories)
+      .where(
+        and(eq(categories.userId, auth.userId), eq(categories.name, "Investasi"))
+      )
+      .limit(1);
+    const investmentCategoryId = investmentCategory[0]?.id;
 
     async function fetchFinancialData(
       userId: string,
       startDate: Date,
       endDate: Date
     ) {
-      const categoryCondition = isCompanyMode && !categoryId
-        ? investmentCategoryId
-          ? eq(transactions.categoryId, investmentCategoryId)
-          : undefined
-        : categoryId
-        ? eq(transactions.categoryId, categoryId)
-        : undefined;
-
       return await db
         .select({
           income:
@@ -86,7 +73,34 @@ const app = new Hono().get(
         .where(
           and(
             accountId ? eq(transactions.accountId, accountId) : undefined,
-            categoryCondition,
+            categoryId ? eq(transactions.categoryId, categoryId) : undefined,
+            eq(accounts.userId, userId),
+            gte(transactions.date, startDate),
+            lte(transactions.date, endDate)
+          )
+        );
+    }
+
+    async function fetchInvestmentAmount(
+      userId: string,
+      startDate: Date,
+      endDate: Date
+    ) {
+      if (!investmentCategoryId) return [{ investment: 0 }];
+
+      return await db
+        .select({
+          investment:
+            sql`SUM(CASE WHEN ${transactions.amount} >= 0 THEN ${transactions.amount} ELSE 0 END)`.mapWith(
+              Number
+            ),
+        })
+        .from(transactions)
+        .innerJoin(accounts, eq(transactions.accountId, accounts.id))
+        .where(
+          and(
+            accountId ? eq(transactions.accountId, accountId) : undefined,
+            eq(transactions.categoryId, investmentCategoryId),
             eq(accounts.userId, userId),
             gte(transactions.date, startDate),
             lte(transactions.date, endDate)
@@ -105,6 +119,17 @@ const app = new Hono().get(
       lastPeriodEnd
     );
 
+    const [currentInvestment] = await fetchInvestmentAmount(
+      auth.userId,
+      startDate,
+      endDate
+    );
+    const [lastInvestment] = await fetchInvestmentAmount(
+      auth.userId,
+      lastPeriodStart,
+      lastPeriodEnd
+    );
+
     const incomeChange = calculatePercentageChange(
       currentPeriod.income,
       lastPeriod.income
@@ -115,9 +140,21 @@ const app = new Hono().get(
       lastPeriod.expenses
     );
 
+    const investmentChange = calculatePercentageChange(
+      currentInvestment.investment,
+      lastInvestment.investment
+    );
+
+    const currentRemaining = investmentCategoryId
+      ? currentInvestment.investment - currentPeriod.expenses
+      : currentPeriod.remaining;
+    const lastRemaining = investmentCategoryId
+      ? lastInvestment.investment - lastPeriod.expenses
+      : lastPeriod.remaining;
+
     const remainingChange = calculatePercentageChange(
-      currentPeriod.remaining,
-      lastPeriod.remaining
+      currentRemaining,
+      lastRemaining
     );
 
     const category = await db
@@ -170,13 +207,7 @@ const app = new Hono().get(
       .where(
         and(
           accountId ? eq(transactions.accountId, accountId) : undefined,
-          isCompanyMode && !categoryId
-            ? investmentCategoryId
-              ? eq(transactions.categoryId, investmentCategoryId)
-              : undefined
-            : categoryId
-            ? eq(transactions.categoryId, categoryId)
-            : undefined,
+          categoryId ? eq(transactions.categoryId, categoryId) : undefined,
           eq(accounts.userId, auth.userId),
           gte(transactions.date, startDate),
           lte(transactions.date, endDate)
@@ -189,15 +220,18 @@ const app = new Hono().get(
 
     return ctx.json({
       data: {
-        remainingAmount: currentPeriod.remaining,
+        remainingAmount: currentRemaining,
         categoryBalance: currentPeriod.categoryBalance,
         remainingChange,
         incomeAmount: currentPeriod.income,
         incomeChange,
+        investmentAmount: currentInvestment.investment,
+        investmentChange,
         expensesAmount: currentPeriod.expenses,
         expensesChange,
         categories: finalCategories,
         days,
+        hasInvestmentCategory: Boolean(investmentCategoryId),
       },
     });
   }

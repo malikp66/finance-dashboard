@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { FaPiggyBank } from "react-icons/fa";
+import { FaPiggyBank, FaCoins } from "react-icons/fa";
 import { FaArrowTrendUp, FaArrowTrendDown, FaWallet } from "react-icons/fa6";
 
 import { useGetSummary } from "@/features/summary/api/use-get-summary";
@@ -16,7 +16,14 @@ export const DataGrid = () => {
   const from = searchParams.get("from") || undefined;
   const categoryId = searchParams.get("categoryId") || "all";
 
-  const gridCols = categoryId !== "all" ? "lg:grid-cols-4" : "lg:grid-cols-3";
+  const hasInvestment = data?.hasInvestmentCategory;
+  const gridCols = categoryId !== "all"
+    ? hasInvestment
+      ? "lg:grid-cols-5"
+      : "lg:grid-cols-4"
+    : hasInvestment
+    ? "lg:grid-cols-4"
+    : "lg:grid-cols-3";
 
   const dateRangeLabel = formatDateRange({ to, from });
 
@@ -40,6 +47,17 @@ export const DataGrid = () => {
         variant="default"
         dateRange={dateRangeLabel}
       />
+
+      {hasInvestment && (
+        <DataCard
+          title="Total Investment"
+          value={data?.investmentAmount}
+          percentageChange={data?.investmentChange}
+          icon={FaCoins}
+          variant="success"
+          dateRange={dateRangeLabel}
+        />
+      )}
 
       {categoryId !== "all" && (
         <DataCard
