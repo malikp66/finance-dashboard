@@ -30,7 +30,7 @@ export const DataGrid = () => {
   return (
     <div className="mb-8 grid grid-cols-1 gap-8 pb-2 lg:grid-cols-3">
       <DataCard
-        title="Remaining"
+        title="Balance"
         value={data?.remainingAmount}
         percentageChange={data?.remainingChange}
         icon={FaPiggyBank}
@@ -39,7 +39,7 @@ export const DataGrid = () => {
       />
 
       <DataCard
-        title="Income"
+        title="Total Income"
         value={data?.incomeAmount}
         percentageChange={data?.incomeChange}
         icon={FaArrowTrendUp}
@@ -48,7 +48,7 @@ export const DataGrid = () => {
       />
 
       <DataCard
-        title="Expenses"
+        title="Total Expenses"
         value={data?.expensesAmount}
         percentageChange={data?.expensesChange}
         icon={FaArrowTrendDown}
