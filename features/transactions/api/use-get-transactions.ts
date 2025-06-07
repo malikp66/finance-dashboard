@@ -9,15 +9,17 @@ export const useGetTransactions = () => {
   const from = searchParams.get("from") || "";
   const to = searchParams.get("to") || "";
   const accountId = searchParams.get("accountId") || "";
+  const categoryId = searchParams.get("categoryId") || "";
 
   const query = useQuery({
-    queryKey: ["transactions", { from, to, accountId }],
+    queryKey: ["transactions", { from, to, accountId, categoryId }],
     queryFn: async () => {
       const response = await client.api.transactions.$get({
         query: {
           from,
           to,
           accountId,
+          categoryId,
         },
       });
 
