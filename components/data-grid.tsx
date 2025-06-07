@@ -39,14 +39,16 @@ export const DataGrid = () => {
 
   return (
     <div className={`mb-8 grid grid-cols-1 gap-8 pb-2 ${gridCols}`}>
-      <DataCard
-        title="Balance"
-        value={data?.remainingAmount}
-        percentageChange={data?.remainingChange}
-        icon={FaPiggyBank}
-        variant="default"
-        dateRange={dateRangeLabel}
-      />
+      {categoryId === "all" && (
+        <DataCard
+          title="Balance"
+          value={data?.remainingAmount}
+          percentageChange={data?.remainingChange}
+          icon={FaPiggyBank}
+          variant="default"
+          dateRange={dateRangeLabel}
+        />
+      )}
 
       {hasInvestment && (
         <DataCard
@@ -69,23 +71,27 @@ export const DataGrid = () => {
         />
       )}
 
-      <DataCard
-        title="Total Income"
-        value={data?.incomeAmount}
-        percentageChange={data?.incomeChange}
-        icon={FaArrowTrendUp}
-        variant="success"
-        dateRange={dateRangeLabel}
-      />
+      {!hasInvestment && (
+        <DataCard
+          title="Total Income"
+          value={data?.incomeAmount}
+          percentageChange={data?.incomeChange}
+          icon={FaArrowTrendUp}
+          variant="success"
+          dateRange={dateRangeLabel}
+        />
+      )}
 
-      <DataCard
-        title="Total Expenses"
-        value={data?.expensesAmount}
-        percentageChange={data?.expensesChange}
-        icon={FaArrowTrendDown}
-        variant="danger"
-        dateRange={dateRangeLabel}
-      />
+      {categoryId !== "investasi" && (
+        <DataCard
+          title="Total Expenses"
+          value={data?.expensesAmount}
+          percentageChange={data?.expensesChange}
+          icon={FaArrowTrendDown}
+          variant="danger"
+          dateRange={dateRangeLabel}
+        />
+      )}
     </div>
   );
 };
