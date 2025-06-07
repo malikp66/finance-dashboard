@@ -53,8 +53,7 @@ export const CategoryFilter = ({ className }: CategoryFilterProps) => {
     router.push(url);
   };
 
-  const { data: categories, isLoading: isLoadingCategories } =
-    useGetCategories();
+  const { data: categories, isLoading: isLoadingCategories } = useGetCategories();
 
   return (
     <Select
