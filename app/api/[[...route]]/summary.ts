@@ -41,6 +41,15 @@ const app = new Hono().get(
     const lastPeriodStart = subDays(startDate, periodLength);
     const lastPeriodEnd = subDays(endDate, periodLength);
 
+    const investmentCategory = await db
+      .select({ id: categories.id })
+      .from(categories)
+      .where(
+        and(eq(categories.userId, auth.userId), eq(categories.name, "Investasi"))
+      )
+      .limit(1);
+    const investmentCategoryId = investmentCategory[0]?.id;
+
     async function fetchFinancialData(
       userId: string,
       startDate: Date,
@@ -72,12 +81,50 @@ const app = new Hono().get(
         );
     }
 
+    async function fetchInvestmentAmount(
+      userId: string,
+      startDate: Date,
+      endDate: Date
+    ) {
+      if (!investmentCategoryId) return [{ investment: 0 }];
+
+      return await db
+        .select({
+          investment:
+            sql`SUM(CASE WHEN ${transactions.amount} >= 0 THEN ${transactions.amount} ELSE 0 END)`.mapWith(
+              Number
+            ),
+        })
+        .from(transactions)
+        .innerJoin(accounts, eq(transactions.accountId, accounts.id))
+        .where(
+          and(
+            accountId ? eq(transactions.accountId, accountId) : undefined,
+            eq(transactions.categoryId, investmentCategoryId),
+            eq(accounts.userId, userId),
+            gte(transactions.date, startDate),
+            lte(transactions.date, endDate)
+          )
+        );
+    }
+
     const [currentPeriod] = await fetchFinancialData(
       auth.userId,
       startDate,
       endDate
     );
     const [lastPeriod] = await fetchFinancialData(
+      auth.userId,
+      lastPeriodStart,
+      lastPeriodEnd
+    );
+
+    const [currentInvestment] = await fetchInvestmentAmount(
+      auth.userId,
+      startDate,
+      endDate
+    );
+    const [lastInvestment] = await fetchInvestmentAmount(
       auth.userId,
       lastPeriodStart,
       lastPeriodEnd
@@ -93,9 +140,21 @@ const app = new Hono().get(
       lastPeriod.expenses
     );
 
+    const investmentChange = calculatePercentageChange(
+      currentInvestment.investment,
+      lastInvestment.investment
+    );
+
+    const currentRemaining = investmentCategoryId
+      ? currentInvestment.investment - currentPeriod.expenses
+      : currentPeriod.remaining;
+    const lastRemaining = investmentCategoryId
+      ? lastInvestment.investment - lastPeriod.expenses
+      : lastPeriod.remaining;
+
     const remainingChange = calculatePercentageChange(
-      currentPeriod.remaining,
-      lastPeriod.remaining
+      currentRemaining,
+      lastRemaining
     );
 
     const category = await db
@@ -161,15 +220,18 @@ const app = new Hono().get(
 
     return ctx.json({
       data: {
-        remainingAmount: currentPeriod.remaining,
+        remainingAmount: currentRemaining,
         categoryBalance: currentPeriod.categoryBalance,
         remainingChange,
         incomeAmount: currentPeriod.income,
         incomeChange,
+        investmentAmount: currentInvestment.investment,
+        investmentChange,
         expensesAmount: currentPeriod.expenses,
         expensesChange,
         categories: finalCategories,
         days,
+        hasInvestmentCategory: Boolean(investmentCategoryId),
       },
     });
   }

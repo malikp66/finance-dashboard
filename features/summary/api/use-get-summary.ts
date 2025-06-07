@@ -32,7 +32,12 @@ export const useGetSummary = () => {
         incomeAmount: convertAmountFromMilliunits(data.incomeAmount),
         expensesAmount: convertAmountFromMilliunits(data.expensesAmount),
         remainingAmount: convertAmountFromMilliunits(data.remainingAmount),
+        investmentAmount: convertAmountFromMilliunits(
+          data.investmentAmount ?? 0
+        ),
+        investmentChange: data.investmentChange,
         categoryBalance: convertAmountFromMilliunits(data.categoryBalance),
+        hasInvestmentCategory: data.hasInvestmentCategory,
         categories: data.categories.map((category) => ({
           ...category,
           value: convertAmountFromMilliunits(category.value),
