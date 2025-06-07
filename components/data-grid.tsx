@@ -38,29 +38,29 @@ export const DataGrid = () => {
         dateRange={dateRangeLabel}
       />
 
-      <div className="relative">
-        <CategoryFilter className="absolute right-2 top-2 h-7 rounded-md border-none bg-white/10 px-2 text-xs font-normal text-white outline-none transition hover:bg-white/30 hover:text-white focus:bg-white/30 focus:ring-transparent focus:ring-offset-0" />
-        <DataCard
-          title="Income"
-          value={data?.incomeAmount}
-          percentageChange={data?.incomeChange}
-          icon={FaArrowTrendUp}
-          variant="success"
-          dateRange={dateRangeLabel}
-        />
-      </div>
+      <DataCard
+        title="Income"
+        value={data?.incomeAmount}
+        percentageChange={data?.incomeChange}
+        icon={FaArrowTrendUp}
+        variant="success"
+        dateRange={dateRangeLabel}
+        action={
+          <CategoryFilter className="h-7 rounded-md border-none bg-white/10 px-2 text-xs font-normal text-white outline-none transition hover:bg-white/30 hover:text-white focus:bg-white/30 focus:ring-transparent focus:ring-offset-0" />
+        }
+      />
 
-      <div className="relative">
-        <CategoryFilter className="absolute right-2 top-2 h-7 rounded-md border-none bg-white/10 px-2 text-xs font-normal text-white outline-none transition hover:bg-white/30 hover:text-white focus:bg-white/30 focus:ring-transparent focus:ring-offset-0" />
-        <DataCard
-          title="Expenses"
-          value={data?.expensesAmount}
-          percentageChange={data?.expensesChange}
-          icon={FaArrowTrendDown}
-          variant="danger"
-          dateRange={dateRangeLabel}
-        />
-      </div>
+      <DataCard
+        title="Expenses"
+        value={data?.expensesAmount}
+        percentageChange={data?.expensesChange}
+        icon={FaArrowTrendDown}
+        variant="danger"
+        dateRange={dateRangeLabel}
+        action={
+          <CategoryFilter className="h-7 rounded-md border-none bg-white/10 px-2 text-xs font-normal text-white outline-none transition hover:bg-white/30 hover:text-white focus:bg-white/30 focus:ring-transparent focus:ring-offset-0" />
+        }
+      />
     </div>
   );
 };

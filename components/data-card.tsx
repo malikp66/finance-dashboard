@@ -51,6 +51,7 @@ type DataCardProps = BoxVariants &
     value?: number;
     dateRange: string;
     percentageChange?: number;
+    action?: React.ReactNode;
   };
 
 export const DataCard = ({
@@ -60,47 +61,51 @@ export const DataCard = ({
   icon: Icon,
   variant,
   dateRange,
+  action,
 }: DataCardProps) => {
   return (
-    <Card className="border-none drop-shadow-sm">
-      <CardHeader className="flex flex-row items-center justify-between gap-x-4">
-        <div className="space-y-2">
-          <CardTitle className="line-clamp-1 text-2xl">{title}</CardTitle>
+    <div className="relative">
+      {action && <div className="absolute right-2 top-2">{action}</div>}
+      <Card className="border-none drop-shadow-sm">
+        <CardHeader className="flex flex-row items-center justify-between gap-x-4">
+          <div className="space-y-2">
+            <CardTitle className="line-clamp-1 text-2xl">{title}</CardTitle>
 
-          <CardDescription className="line-clamp-1">
-            {dateRange}
-          </CardDescription>
-        </div>
+            <CardDescription className="line-clamp-1">
+              {dateRange}
+            </CardDescription>
+          </div>
 
-        <div className={cn(boxVariant({ variant }))}>
-          <Icon className={cn(iconVariant({ variant }))} />
-        </div>
-      </CardHeader>
+          <div className={cn(boxVariant({ variant }))}>
+            <Icon className={cn(iconVariant({ variant }))} />
+          </div>
+        </CardHeader>
 
-      <CardContent>
-        <h1 className="mb-2 line-clamp-1 break-all text-2xl font-bold">
-          <CountUp
-            preserveValue
-            start={0}
-            end={value}
-            decimals={2}
-            decimalPlaces={2}
-            formattingFn={formatCurrency}
-          />
-        </h1>
+        <CardContent>
+          <h1 className="mb-2 line-clamp-1 break-all text-2xl font-bold">
+            <CountUp
+              preserveValue
+              start={0}
+              end={value}
+              decimals={2}
+              decimalPlaces={2}
+              formattingFn={formatCurrency}
+            />
+          </h1>
 
-        <p
-          className={cn(
-            "line-clamp-1 text-sm text-muted-foreground",
-            percentageChange > 0 && "text-emerald-500",
-            percentageChange < 0 && "text-rose-500"
-          )}
-        >
-          {formatPercentage(percentageChange, { addPrefix: true })} from last
-          period.
-        </p>
-      </CardContent>
-    </Card>
+          <p
+            className={cn(
+              "line-clamp-1 text-sm text-muted-foreground",
+              percentageChange > 0 && "text-emerald-500",
+              percentageChange < 0 && "text-rose-500"
+            )}
+          >
+            {formatPercentage(percentageChange, { addPrefix: true })} from last
+            period.
+          </p>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 
