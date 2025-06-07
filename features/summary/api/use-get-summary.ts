@@ -10,9 +10,10 @@ export const useGetSummary = () => {
   const to = searchParams.get("to") || "";
   const accountId = searchParams.get("accountId") || "";
   const categoryId = searchParams.get("categoryId") || "";
+  const companyMode = searchParams.get("companyMode") || "";
 
   const query = useQuery({
-    queryKey: ["summary", { from, to, accountId, categoryId }],
+    queryKey: ["summary", { from, to, accountId, categoryId, companyMode }],
     queryFn: async () => {
       const response = await client.api.summary.$get({
         query: {
@@ -20,6 +21,7 @@ export const useGetSummary = () => {
           to,
           accountId,
           categoryId,
+          companyMode,
         },
       });
 

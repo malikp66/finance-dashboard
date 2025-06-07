@@ -5,6 +5,7 @@ import { Filters } from "./filters";
 import { HeaderLogo } from "./header-logo";
 import { Navigation } from "./navigation";
 import { WelcomeMsg } from "./welcome-msg";
+import { CompanyModeSwitch } from "./company-mode-switch";
 
 export const Header = () => {
   return (
@@ -17,6 +18,7 @@ export const Header = () => {
           </div>
 
           <div className="flex items-center gap-x-2">
+            <CompanyModeSwitch />
             <ClerkLoaded>
               <UserButton afterSignOutUrl="/" />
             </ClerkLoaded>
