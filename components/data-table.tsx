@@ -14,6 +14,7 @@ import {
 } from "@tanstack/react-table";
 import { Trash } from "lucide-react";
 import * as React from "react";
+import { CategoryFilter } from "@/components/category-filter";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -74,14 +75,17 @@ export function DataTable<TData, TValue>({
       <ConfirmDialog />
 
       <div className="flex items-center py-4">
-        <Input
-          placeholder={`Filter ${filterKey}...`}
-          value={(table.getColumn(filterKey)?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn(filterKey)?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
+        <div className="flex items-center gap-4">
+          <Input
+            placeholder={`Filter Nama Penerima...`}
+            value={(table.getColumn(filterKey)?.getFilterValue() as string) ?? ""}
+            onChange={(event) =>
+              table.getColumn(filterKey)?.setFilterValue(event.target.value)
+            }
+            className="max-w-sm"
+          />
+          <CategoryFilter className="w-48" />
+        </div>
 
         {table.getFilteredSelectedRowModel().rows.length > 0 && (
           <Button

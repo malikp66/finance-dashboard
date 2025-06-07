@@ -5,7 +5,6 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { DataTable } from "@/components/data-table";
-import { CategoryFilter } from "@/components/category-filter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -117,7 +116,6 @@ const TransactionsPage = () => {
           </CardTitle>
 
           <div className="flex flex-col items-center gap-x-2 gap-y-2 lg:flex-row">
-            <CategoryFilter className="w-48" />
             <Button
               size="sm"
               onClick={newTransaction.onOpen}
