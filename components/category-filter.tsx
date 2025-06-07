@@ -30,14 +30,24 @@ export const CategoryFilter = ({ className }: CategoryFilterProps) => {
   const to = searchParams.get("to") || "";
 
   const onChange = (newValue: string) => {
+    let categoryName = "all";
+    if (newValue !== "all") {
+      const selectedCategory = categories?.find((cat) => cat.id === newValue);
+      categoryName = selectedCategory?.name ?? "";
+    }
+
     const query: Record<string, string> = {
       accountId,
       from,
       to,
       categoryId: newValue,
+      categoryName,
     };
 
-    if (newValue === "all") delete query.categoryId;
+    if (newValue === "all") {
+      delete query.categoryId;
+      delete query.categoryName;
+    }
     if (!accountId) delete query.accountId;
     if (!from) delete query.from;
     if (!to) delete query.to;
@@ -52,6 +62,7 @@ export const CategoryFilter = ({ className }: CategoryFilterProps) => {
 
     router.push(url);
   };
+
 
   const { data: categories, isLoading: isLoadingCategories } = useGetCategories();
 

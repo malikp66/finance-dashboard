@@ -15,15 +15,15 @@ export const DataGrid = () => {
   const to = searchParams.get("to") || undefined;
   const from = searchParams.get("from") || undefined;
   const categoryId = searchParams.get("categoryId") || "all";
+  const categoryName = searchParams.get("categoryName") || "all";
   const hasInvestment = data?.hasInvestmentCategory;
 
   // Perhitungan jumlah card yang AKTIF
   let cardCount = 0;
-  if (categoryId === "all") cardCount++;
   if (hasInvestment) cardCount++;
-  if (categoryId !== "all") cardCount++;
-  if (categoryId !== "Pribadi") cardCount++;
-  if (categoryId !== "Investasi") cardCount++;
+  if (categoryName !== "all") cardCount++;
+  if (categoryName !== "Pribadi") cardCount++;
+  if (categoryName !== "Investasi") cardCount++;
 
   // Atur grid cols sesuai jumlah card
   // Responsive: 1 untuk mobile, 2 untuk md, ... cardCount untuk lg
@@ -42,7 +42,7 @@ export const DataGrid = () => {
 
   return (
     <div className={`mb-8 grid ${gridCols} gap-8 pb-2`}>
-      {categoryId === "all" && (
+      {categoryName === "all" && (
         <DataCard
           title="Balance"
           value={data?.remainingAmount}
@@ -62,7 +62,7 @@ export const DataGrid = () => {
           dateRange={dateRangeLabel}
         />
       )}
-      {categoryId !== "all" && (
+      {categoryName !== "all" && (
         <DataCard
           title="Category Balance"
           value={data?.categoryBalance}
@@ -71,7 +71,7 @@ export const DataGrid = () => {
           dateRange={dateRangeLabel}
         />
       )}
-      {categoryId !== "Pribadi" && (
+      {categoryName !== "Pribadi" && (
         <DataCard
           title="Total Income"
           value={data?.incomeAmount}
@@ -81,7 +81,7 @@ export const DataGrid = () => {
           dateRange={dateRangeLabel}
         />
       )}
-      {categoryId !== "Investasi" && (
+      {categoryName !== "Investasi" && (
         <DataCard
           title="Total Expenses"
           value={data?.expensesAmount}
