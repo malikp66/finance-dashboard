@@ -8,7 +8,6 @@ import { useGetSummary } from "@/features/summary/api/use-get-summary";
 import { formatDateRange } from "@/lib/utils";
 
 import { DataCard, DataCardLoading } from "./data-card";
-import { CategoryFilter } from "./category-filter";
 
 export const DataGrid = () => {
   const { data, isLoading } = useGetSummary();
