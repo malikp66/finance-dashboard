@@ -19,11 +19,13 @@ const app = new Hono().get(
       to: z.string().optional(),
       accountId: z.string().optional(),
       categoryId: z.string().optional(),
+      companyMode: z.string().optional(),
     })
   ),
   async (ctx) => {
     const auth = getAuth(ctx);
-    const { from, to, accountId, categoryId } = ctx.req.valid("query");
+    const { from, to, accountId, categoryId, companyMode } = ctx.req.valid("query");
+    const isCompanyMode = companyMode === "true";
 
     if (!auth?.userId) {
       return ctx.json({ error: "Unauthorized." }, 401);
@@ -55,6 +57,14 @@ const app = new Hono().get(
       startDate: Date,
       endDate: Date
     ) {
+      const categoryCondition = isCompanyMode && !categoryId
+        ? investmentCategoryId
+          ? eq(transactions.categoryId, investmentCategoryId)
+          : undefined
+        : categoryId
+        ? eq(transactions.categoryId, categoryId)
+        : undefined;
+
       return await db
         .select({
           income:
@@ -73,7 +83,7 @@ const app = new Hono().get(
         .where(
           and(
             accountId ? eq(transactions.accountId, accountId) : undefined,
-            categoryId ? eq(transactions.categoryId, categoryId) : undefined,
+            categoryCondition,
             eq(accounts.userId, userId),
             gte(transactions.date, startDate),
             lte(transactions.date, endDate)
@@ -207,7 +217,13 @@ const app = new Hono().get(
       .where(
         and(
           accountId ? eq(transactions.accountId, accountId) : undefined,
-          categoryId ? eq(transactions.categoryId, categoryId) : undefined,
+          isCompanyMode && !categoryId
+            ? investmentCategoryId
+              ? eq(transactions.categoryId, investmentCategoryId)
+              : undefined
+            : categoryId
+            ? eq(transactions.categoryId, categoryId)
+            : undefined,
           eq(accounts.userId, auth.userId),
           gte(transactions.date, startDate),
           lte(transactions.date, endDate)
