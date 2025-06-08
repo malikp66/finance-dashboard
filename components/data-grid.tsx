@@ -18,12 +18,13 @@ export const DataGrid = () => {
   const categoryName = searchParams.get("categoryName") || "all";
   const hasInvestment = data?.hasInvestmentCategory;
 
-  // Perhitungan jumlah card yang AKTIF
   let cardCount = 0;
-  if (hasInvestment) cardCount++;
-  if (categoryName !== "all") cardCount++;
-  if (categoryName !== "Pribadi") cardCount++;
-  if (categoryName !== "Investasi") cardCount++;
+  if (categoryName === "all") cardCount++; // Balance
+  if (hasInvestment && categoryName === "all") cardCount++; // Total Investment
+  if (categoryName !== "all") cardCount++; // Category Balance
+  if (categoryName === "Pribadi") cardCount++; // Total Income
+  if (categoryName !== "Investasi") cardCount++; // Total Expenses
+
 
   // Atur grid cols sesuai jumlah card
   // Responsive: 1 untuk mobile, 2 untuk md, ... cardCount untuk lg
@@ -52,7 +53,7 @@ export const DataGrid = () => {
           dateRange={dateRangeLabel}
         />
       )}
-      {hasInvestment && (
+      {hasInvestment && categoryName === "all" && (
         <DataCard
           title="Total Investment"
           value={data?.investmentAmount}
@@ -71,7 +72,7 @@ export const DataGrid = () => {
           dateRange={dateRangeLabel}
         />
       )}
-      {categoryName !== "Pribadi" && (
+      {categoryName === "Pribadi" && (
         <DataCard
           title="Total Income"
           value={data?.incomeAmount}
