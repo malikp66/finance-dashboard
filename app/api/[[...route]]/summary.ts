@@ -27,7 +27,7 @@ const app = new Hono().get(
     const { from, to, accountId, categoryId, companyMode } =
       ctx.req.valid("query");
     const isCompanyMode = companyMode === "true";
-    const orgId = (auth?.sessionClaims as any)?.org_id;
+    const orgId = auth?.orgId;
 
     if (!auth?.userId) {
       return ctx.json({ error: "Unauthorized." }, 401);

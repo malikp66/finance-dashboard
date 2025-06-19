@@ -30,7 +30,7 @@ const app = new Hono()
     async (ctx) => {
       const auth = getAuth(ctx);
       const { from, to, accountId, categoryId } = ctx.req.valid("query");
-      const orgId = (auth?.sessionClaims as any)?.org_id;
+      const orgId = auth?.orgId;
 
       if (!auth?.userId) {
         return ctx.json({ error: "Unauthorized." }, 401);
@@ -88,7 +88,7 @@ const app = new Hono()
     async (ctx) => {
       const auth = getAuth(ctx);
       const { id } = ctx.req.valid("param");
-      const orgId = (auth?.sessionClaims as any)?.org_id;
+      const orgId = auth?.orgId;
 
       if (!id) {
         return ctx.json({ error: "Missing id." }, 400);
@@ -136,7 +136,7 @@ const app = new Hono()
     async (ctx) => {
       const auth = getAuth(ctx);
       const values = ctx.req.valid("json");
-      const orgId = (auth?.sessionClaims as any)?.org_id;
+      const orgId = auth?.orgId;
 
       if (!auth?.userId) {
         return ctx.json({ error: "Unauthorized." }, 401);
@@ -190,7 +190,7 @@ const app = new Hono()
     async (ctx) => {
       const auth = getAuth(ctx);
       const values = ctx.req.valid("json");
-        const orgId = (auth?.sessionClaims as any)?.org_id;
+        const orgId = auth?.orgId;
 
       if (!auth?.userId) {
         return ctx.json({ error: "Unauthorized." }, 401);
@@ -244,7 +244,7 @@ const app = new Hono()
       const auth = getAuth(ctx);
       const { id } = ctx.req.valid("param");
       const values = ctx.req.valid("json");
-      const orgId = (auth?.sessionClaims as any)?.org_id;
+      const orgId = auth?.orgId;
 
       if (!id) {
         return ctx.json({ error: "Missing id." }, 400);
@@ -298,7 +298,7 @@ const app = new Hono()
     async (ctx) => {
       const auth = getAuth(ctx);
       const { id } = ctx.req.valid("param");
-        const orgId = (auth?.sessionClaims as any)?.org_id;
+        const orgId = auth?.orgId;
 
       if (!id) {
         return ctx.json({ error: "Missing id." }, 400);
