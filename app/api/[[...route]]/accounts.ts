@@ -11,6 +11,9 @@ import { accounts, insertAccountSchema } from "@/db/schema";
 const app = new Hono()
   .get("/", clerkMiddleware(), async (ctx) => {
     const auth = getAuth(ctx);
+    const userRole =
+      (auth?.sessionClaims as any)?.public_metadata?.role ??
+      (auth?.sessionClaims as any)?.publicMetadata?.role;
 
     if (!auth?.userId) {
       return ctx.json({ error: "Unauthorized." }, 401);
@@ -20,9 +23,12 @@ const app = new Hono()
       .select({
         id: accounts.id,
         name: accounts.name,
+        role: accounts.role,
       })
       .from(accounts)
-      .where(eq(accounts.userId, auth.userId));
+      .where(
+        userRole ? eq(accounts.role, userRole) : eq(accounts.userId, auth.userId)
+      );
 
     return ctx.json({ data });
   })
@@ -38,6 +44,9 @@ const app = new Hono()
     async (ctx) => {
       const auth = getAuth(ctx);
       const { id } = ctx.req.valid("param");
+      const userRole =
+        (auth?.sessionClaims as any)?.public_metadata?.role ??
+        (auth?.sessionClaims as any)?.publicMetadata?.role;
 
       if (!id) {
         return ctx.json({ error: "Missing id." }, 400);
@@ -51,9 +60,15 @@ const app = new Hono()
         .select({
           id: accounts.id,
           name: accounts.name,
+          role: accounts.role,
         })
         .from(accounts)
-        .where(and(eq(accounts.userId, auth.userId), eq(accounts.id, id)));
+        .where(
+          and(
+            eq(accounts.id, id),
+            userRole ? eq(accounts.role, userRole) : eq(accounts.userId, auth.userId)
+          )
+        );
 
       if (!data) {
         return ctx.json({ error: "Not found." }, 404);
@@ -74,6 +89,9 @@ const app = new Hono()
     async (ctx) => {
       const auth = getAuth(ctx);
       const values = ctx.req.valid("json");
+      const userRole =
+        (auth?.sessionClaims as any)?.public_metadata?.role ??
+        (auth?.sessionClaims as any)?.publicMetadata?.role;
 
       if (!auth?.userId) {
         return ctx.json({ error: "Unauthorized." }, 401);
@@ -84,6 +102,7 @@ const app = new Hono()
         .values({
           id: createId(),
           userId: auth.userId,
+          role: userRole ?? "default",
           ...values,
         })
         .returning();

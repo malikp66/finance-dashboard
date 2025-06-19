@@ -1,6 +1,6 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { eachDayOfInterval, format, isSameDay, subDays } from "date-fns";
+import { eachDayOfInterval, format, isSameDay } from "date-fns";
 import { id } from "date-fns/locale";
 
 export function cn(...inputs: ClassValue[]) {
@@ -69,36 +69,30 @@ type Period = {
 };
 
 export function formatDateRange(period?: Period) {
-  const defaultTo = new Date();
-  const defaultFrom = subDays(defaultTo, 30);
-
-  if (!period?.from) {
-    return `${format(defaultFrom, "d MMM", { locale: id })} - ${format(
-      defaultTo,
-      "d MMM yyyy",
-      { locale: id }
-    )}`;
+  if (!period?.from && !period?.to) {
+    return "All dates";
   }
 
   if (period?.to) {
-    return `${format(new Date(period.from), "d MMM", { locale: id })} - ${format(
+    return `${format(new Date(period.from!), "d MMM", { locale: id })} - ${format(
       new Date(period.to),
       "d MMM yyyy",
       { locale: id }
     )}`;
   }
 
-  return format(new Date(period.from), "d MMM yyyy", { locale: id });
+  return format(new Date(period.from!), "d MMM yyyy", { locale: id });
 }
 
 export function formatPercentage(
   value: number,
   options: { addPrefix?: boolean } = { addPrefix: false }
 ) {
-  const formatted = new Intl.NumberFormat("id-ID", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(value) + "%";
+  const formatted =
+    new Intl.NumberFormat("id-ID", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(value) + "%";
 
   if (options.addPrefix && value > 0) return `+${formatted}`;
 
