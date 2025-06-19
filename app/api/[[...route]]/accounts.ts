@@ -84,6 +84,7 @@ const app = new Hono()
       "json",
       insertAccountSchema.pick({
         name: true,
+        role: true,
       })
     ),
     async (ctx) => {
@@ -155,6 +156,7 @@ const app = new Hono()
       "json",
       insertAccountSchema.pick({
         name: true,
+        role: true,
       })
     ),
     async (ctx) => {

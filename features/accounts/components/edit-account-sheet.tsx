@@ -19,6 +19,7 @@ import { AccountForm } from "./account-form";
 
 const formSchema = insertAccountSchema.pick({
   name: true,
+  role: true,
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -50,9 +51,11 @@ export const EditAccountSheet = () => {
   const defaultValues = accountQuery.data
     ? {
         name: accountQuery.data.name,
+        role: accountQuery.data.role,
       }
     : {
         name: "",
+        role: "default",
       };
 
   const onDelete = async () => {

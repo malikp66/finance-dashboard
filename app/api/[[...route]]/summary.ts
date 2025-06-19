@@ -96,7 +96,6 @@ const app = new Hono().get(
         .innerJoin(accounts, eq(transactions.accountId, accounts.id))
         .where(
           and(
-            accountCondition,
             categoryCondition,
             eq(accounts.userId, userId),
             gte(transactions.date, startDate),
