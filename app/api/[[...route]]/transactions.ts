@@ -1,7 +1,7 @@
 import { clerkMiddleware, getAuth } from "@hono/clerk-auth";
 import { zValidator } from "@hono/zod-validator";
 import { createId } from "@paralleldrive/cuid2";
-import { parse, subDays } from "date-fns";
+import { parse } from "date-fns";
 import { and, desc, eq, gte, inArray, lte, sql } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
@@ -30,18 +30,22 @@ const app = new Hono()
     async (ctx) => {
       const auth = getAuth(ctx);
       const { from, to, accountId, categoryId } = ctx.req.valid("query");
+      const orgId = (auth?.sessionClaims as any)?.org_id;
 
       if (!auth?.userId) {
         return ctx.json({ error: "Unauthorized." }, 401);
       }
 
-      const defaultTo = new Date();
-      const defaultFrom = subDays(defaultTo, 30);
-
       const startDate = from
         ? parse(from, "yyyy-MM-dd", new Date())
-        : defaultFrom;
-      const endDate = to ? parse(to, "yyyy-MM-dd", new Date()) : defaultTo;
+        : undefined;
+      const endDate = to ? parse(to, "yyyy-MM-dd", new Date()) : undefined;
+
+      const accountCondition = accountId
+        ? eq(transactions.accountId, accountId)
+        : orgId
+          ? eq(accounts.orgId, orgId)
+          : eq(accounts.userId, auth.userId);
 
       const data = await db
         .select({
@@ -60,11 +64,11 @@ const app = new Hono()
         .leftJoin(categories, eq(transactions.categoryId, categories.id))
         .where(
           and(
-            accountId ? eq(transactions.accountId, accountId) : undefined,
+            accountCondition,
             categoryId ? eq(transactions.categoryId, categoryId) : undefined,
-            eq(accounts.userId, auth.userId),
-            gte(transactions.date, startDate),
-            lte(transactions.date, endDate)
+            orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId),
+            startDate ? gte(transactions.date, startDate) : undefined,
+            endDate ? lte(transactions.date, endDate) : undefined
           )
         )
         .orderBy(desc(transactions.date));
@@ -84,6 +88,7 @@ const app = new Hono()
     async (ctx) => {
       const auth = getAuth(ctx);
       const { id } = ctx.req.valid("param");
+      const orgId = (auth?.sessionClaims as any)?.org_id;
 
       if (!id) {
         return ctx.json({ error: "Missing id." }, 400);
@@ -105,7 +110,12 @@ const app = new Hono()
         })
         .from(transactions)
         .innerJoin(accounts, eq(transactions.accountId, accounts.id))
-        .where(and(eq(transactions.id, id), eq(accounts.userId, auth.userId)));
+        .where(
+          and(
+            eq(transactions.id, id),
+            orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId)
+          )
+        );
 
       if (!data) {
         return ctx.json({ error: "Not found." }, 404);
@@ -126,6 +136,7 @@ const app = new Hono()
     async (ctx) => {
       const auth = getAuth(ctx);
       const values = ctx.req.valid("json");
+      const orgId = (auth?.sessionClaims as any)?.org_id;
 
       if (!auth?.userId) {
         return ctx.json({ error: "Unauthorized." }, 401);
@@ -179,6 +190,7 @@ const app = new Hono()
     async (ctx) => {
       const auth = getAuth(ctx);
       const values = ctx.req.valid("json");
+        const orgId = (auth?.sessionClaims as any)?.org_id;
 
       if (!auth?.userId) {
         return ctx.json({ error: "Unauthorized." }, 401);
@@ -192,7 +204,7 @@ const app = new Hono()
           .where(
             and(
               inArray(transactions.id, values.ids),
-              eq(accounts.userId, auth.userId)
+              orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId)
             )
           )
       );
@@ -232,6 +244,7 @@ const app = new Hono()
       const auth = getAuth(ctx);
       const { id } = ctx.req.valid("param");
       const values = ctx.req.valid("json");
+      const orgId = (auth?.sessionClaims as any)?.org_id;
 
       if (!id) {
         return ctx.json({ error: "Missing id." }, 400);
@@ -246,7 +259,12 @@ const app = new Hono()
           .select({ id: transactions.id })
           .from(transactions)
           .innerJoin(accounts, eq(transactions.accountId, accounts.id))
-          .where(and(eq(transactions.id, id), eq(accounts.userId, auth.userId)))
+          .where(
+            and(
+              eq(transactions.id, id),
+              orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId)
+            )
+          )
       );
 
       const [data] = await db
@@ -280,6 +298,7 @@ const app = new Hono()
     async (ctx) => {
       const auth = getAuth(ctx);
       const { id } = ctx.req.valid("param");
+        const orgId = (auth?.sessionClaims as any)?.org_id;
 
       if (!id) {
         return ctx.json({ error: "Missing id." }, 400);
@@ -294,7 +313,12 @@ const app = new Hono()
           .select({ id: transactions.id })
           .from(transactions)
           .innerJoin(accounts, eq(transactions.accountId, accounts.id))
-          .where(and(eq(transactions.id, id), eq(accounts.userId, auth.userId)))
+          .where(
+            and(
+              eq(transactions.id, id),
+              orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId)
+            )
+          )
       );
 
       const [data] = await db

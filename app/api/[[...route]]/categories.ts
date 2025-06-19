@@ -11,6 +11,7 @@ import { categories, insertCategorySchema } from "@/db/schema";
 const app = new Hono()
   .get("/", clerkMiddleware(), async (ctx) => {
     const auth = getAuth(ctx);
+    const orgId = (auth?.sessionClaims as any)?.org_id;
 
     if (!auth?.userId) {
       return ctx.json({ error: "Unauthorized." }, 401);
@@ -22,7 +23,7 @@ const app = new Hono()
         name: categories.name,
       })
       .from(categories)
-      .where(eq(categories.userId, auth.userId));
+      .where(orgId ? eq(categories.orgId, orgId) : eq(categories.userId, auth.userId));
 
     return ctx.json({ data });
   })
@@ -38,6 +39,7 @@ const app = new Hono()
     async (ctx) => {
       const auth = getAuth(ctx);
       const { id } = ctx.req.valid("param");
+      const orgId = (auth?.sessionClaims as any)?.org_id;
 
       if (!id) {
         return ctx.json({ error: "Missing id." }, 400);
@@ -53,7 +55,12 @@ const app = new Hono()
           name: categories.name,
         })
         .from(categories)
-        .where(and(eq(categories.userId, auth.userId), eq(categories.id, id)));
+        .where(
+          and(
+            eq(categories.id, id),
+            orgId ? eq(categories.orgId, orgId) : eq(categories.userId, auth.userId)
+          )
+        );
 
       if (!data) {
         return ctx.json({ error: "Not found." }, 404);
@@ -73,6 +80,7 @@ const app = new Hono()
     ),
     async (ctx) => {
       const auth = getAuth(ctx);
+      const orgId = (auth?.sessionClaims as any)?.org_id;
       const values = ctx.req.valid("json");
 
       if (!auth?.userId) {
@@ -84,6 +92,7 @@ const app = new Hono()
         .values({
           id: createId(),
           userId: auth.userId,
+          orgId,
           ...values,
         })
         .returning();
@@ -102,6 +111,7 @@ const app = new Hono()
     ),
     async (ctx) => {
       const auth = getAuth(ctx);
+      const orgId = (auth?.sessionClaims as any)?.org_id;
       const values = ctx.req.valid("json");
 
       if (!auth?.userId) {
@@ -112,7 +122,7 @@ const app = new Hono()
         .delete(categories)
         .where(
           and(
-            eq(categories.userId, auth.userId),
+            orgId ? eq(categories.orgId, orgId) : eq(categories.userId, auth.userId),
             inArray(categories.id, values.ids)
           )
         )
@@ -142,6 +152,7 @@ const app = new Hono()
       const auth = getAuth(ctx);
       const { id } = ctx.req.valid("param");
       const values = ctx.req.valid("json");
+      const orgId = (auth?.sessionClaims as any)?.org_id;
 
       if (!id) {
         return ctx.json({ error: "Missing id." }, 400);
@@ -154,7 +165,12 @@ const app = new Hono()
       const [data] = await db
         .update(categories)
         .set(values)
-        .where(and(eq(categories.userId, auth.userId), eq(categories.id, id)))
+        .where(
+          and(
+            (orgId ? eq(categories.orgId, orgId) : eq(categories.userId, auth.userId)),
+            eq(categories.id, id)
+          )
+        )
         .returning();
 
       if (!data) {
@@ -176,6 +192,7 @@ const app = new Hono()
     async (ctx) => {
       const auth = getAuth(ctx);
       const { id } = ctx.req.valid("param");
+      const orgId = (auth?.sessionClaims as any)?.org_id;
 
       if (!id) {
         return ctx.json({ error: "Missing id." }, 400);
@@ -187,7 +204,12 @@ const app = new Hono()
 
       const [data] = await db
         .delete(categories)
-        .where(and(eq(categories.userId, auth.userId), eq(categories.id, id)))
+        .where(
+          and(
+            (orgId ? eq(categories.orgId, orgId) : eq(categories.userId, auth.userId)),
+            eq(categories.id, id)
+          )
+        )
         .returning({
           id: categories.id,
         });

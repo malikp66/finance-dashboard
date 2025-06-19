@@ -24,20 +24,28 @@ const app = new Hono().get(
   ),
   async (ctx) => {
     const auth = getAuth(ctx);
-    const { from, to, accountId, categoryId, companyMode } = ctx.req.valid("query");
+    const { from, to, accountId, categoryId, companyMode } =
+      ctx.req.valid("query");
     const isCompanyMode = companyMode === "true";
+    const orgId = (auth?.sessionClaims as any)?.org_id;
 
     if (!auth?.userId) {
       return ctx.json({ error: "Unauthorized." }, 401);
     }
 
     const defaultTo = new Date();
-    const defaultFrom = subDays(defaultTo, 30);
+    const defaultFrom = new Date(0);
 
     const startDate = from
       ? parse(from, "yyyy-MM-dd", new Date())
       : defaultFrom;
     const endDate = to ? parse(to, "yyyy-MM-dd", new Date()) : defaultTo;
+
+    const accountCondition = accountId
+      ? eq(transactions.accountId, accountId)
+      : orgId
+        ? eq(accounts.orgId, orgId)
+        : eq(accounts.userId, auth.userId);
 
     const periodLength = differenceInDays(endDate, startDate) + 1;
     const lastPeriodStart = subDays(startDate, periodLength);
@@ -47,7 +55,10 @@ const app = new Hono().get(
       .select({ id: categories.id })
       .from(categories)
       .where(
-        and(eq(categories.userId, auth.userId), eq(categories.name, "Investasi"))
+        and(
+          orgId ? eq(categories.orgId, orgId) : eq(categories.userId, auth.userId),
+          eq(categories.name, "Investasi")
+        )
       )
       .limit(1);
     const investmentCategoryId = investmentCategory[0]?.id;
@@ -57,13 +68,14 @@ const app = new Hono().get(
       startDate: Date,
       endDate: Date
     ) {
-      const categoryCondition = isCompanyMode && !categoryId
-        ? investmentCategoryId
-          ? eq(transactions.categoryId, investmentCategoryId)
-          : undefined
-        : categoryId
-        ? eq(transactions.categoryId, categoryId)
-        : undefined;
+      const categoryCondition =
+        isCompanyMode && !categoryId
+          ? investmentCategoryId
+            ? eq(transactions.categoryId, investmentCategoryId)
+            : undefined
+          : categoryId
+            ? eq(transactions.categoryId, categoryId)
+            : undefined;
 
       return await db
         .select({
@@ -82,9 +94,9 @@ const app = new Hono().get(
         .innerJoin(accounts, eq(transactions.accountId, accounts.id))
         .where(
           and(
-            accountId ? eq(transactions.accountId, accountId) : undefined,
+            accountCondition,
             categoryCondition,
-            eq(accounts.userId, userId),
+            orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, userId),
             gte(transactions.date, startDate),
             lte(transactions.date, endDate)
           )
@@ -109,9 +121,9 @@ const app = new Hono().get(
         .innerJoin(accounts, eq(transactions.accountId, accounts.id))
         .where(
           and(
-            accountId ? eq(transactions.accountId, accountId) : undefined,
+            accountCondition,
             eq(transactions.categoryId, investmentCategoryId),
-            eq(accounts.userId, userId),
+            orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, userId),
             gte(transactions.date, startDate),
             lte(transactions.date, endDate)
           )
@@ -177,9 +189,9 @@ const app = new Hono().get(
       .innerJoin(categories, eq(transactions.categoryId, categories.id))
       .where(
         and(
-          accountId ? eq(transactions.accountId, accountId) : undefined,
+          accountCondition,
           categoryId ? eq(transactions.categoryId, categoryId) : undefined,
-          eq(accounts.userId, auth.userId),
+          orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId),
           lt(transactions.amount, 0),
           gte(transactions.date, startDate),
           lte(transactions.date, endDate)
@@ -216,15 +228,15 @@ const app = new Hono().get(
       .innerJoin(accounts, eq(transactions.accountId, accounts.id))
       .where(
         and(
-          accountId ? eq(transactions.accountId, accountId) : undefined,
+          accountCondition,
           isCompanyMode && !categoryId
             ? investmentCategoryId
               ? eq(transactions.categoryId, investmentCategoryId)
               : undefined
             : categoryId
-            ? eq(transactions.categoryId, categoryId)
-            : undefined,
-          eq(accounts.userId, auth.userId),
+              ? eq(transactions.categoryId, categoryId)
+              : undefined,
+          orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId),
           gte(transactions.date, startDate),
           lte(transactions.date, endDate)
         )
