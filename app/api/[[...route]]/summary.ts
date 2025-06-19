@@ -27,9 +27,7 @@ const app = new Hono().get(
     const { from, to, accountId, categoryId, companyMode } =
       ctx.req.valid("query");
     const isCompanyMode = companyMode === "true";
-    const userRole =
-      (auth?.sessionClaims as any)?.public_metadata?.role ??
-      (auth?.sessionClaims as any)?.publicMetadata?.role;
+    const orgId = (auth?.sessionClaims as any)?.org_id;
 
     if (!auth?.userId) {
       return ctx.json({ error: "Unauthorized." }, 401);
@@ -45,8 +43,8 @@ const app = new Hono().get(
 
     const accountCondition = accountId
       ? eq(transactions.accountId, accountId)
-      : userRole
-        ? eq(accounts.role, userRole)
+      : orgId
+        ? eq(accounts.orgId, orgId)
         : eq(accounts.userId, auth.userId);
 
     const periodLength = differenceInDays(endDate, startDate) + 1;
@@ -58,7 +56,7 @@ const app = new Hono().get(
       .from(categories)
       .where(
         and(
-          eq(categories.userId, auth.userId),
+          orgId ? eq(categories.orgId, orgId) : eq(categories.userId, auth.userId),
           eq(categories.name, "Investasi")
         )
       )
@@ -96,8 +94,9 @@ const app = new Hono().get(
         .innerJoin(accounts, eq(transactions.accountId, accounts.id))
         .where(
           and(
+            accountCondition,
             categoryCondition,
-            eq(accounts.userId, userId),
+            orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, userId),
             gte(transactions.date, startDate),
             lte(transactions.date, endDate)
           )
@@ -124,7 +123,7 @@ const app = new Hono().get(
           and(
             accountCondition,
             eq(transactions.categoryId, investmentCategoryId),
-            eq(accounts.userId, userId),
+            orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, userId),
             gte(transactions.date, startDate),
             lte(transactions.date, endDate)
           )
@@ -192,7 +191,7 @@ const app = new Hono().get(
         and(
           accountCondition,
           categoryId ? eq(transactions.categoryId, categoryId) : undefined,
-          eq(accounts.userId, auth.userId),
+          orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId),
           lt(transactions.amount, 0),
           gte(transactions.date, startDate),
           lte(transactions.date, endDate)
@@ -237,7 +236,7 @@ const app = new Hono().get(
             : categoryId
               ? eq(transactions.categoryId, categoryId)
               : undefined,
-          eq(accounts.userId, auth.userId),
+          orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId),
           gte(transactions.date, startDate),
           lte(transactions.date, endDate)
         )

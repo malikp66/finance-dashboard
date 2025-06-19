@@ -11,9 +11,7 @@ import { accounts, insertAccountSchema } from "@/db/schema";
 const app = new Hono()
   .get("/", clerkMiddleware(), async (ctx) => {
     const auth = getAuth(ctx);
-    const userRole =
-      (auth?.sessionClaims as any)?.public_metadata?.role ??
-      (auth?.sessionClaims as any)?.publicMetadata?.role;
+    const orgId = (auth?.sessionClaims as any)?.org_id;
 
     if (!auth?.userId) {
       return ctx.json({ error: "Unauthorized." }, 401);
@@ -26,9 +24,7 @@ const app = new Hono()
         role: accounts.role,
       })
       .from(accounts)
-      .where(
-        userRole ? eq(accounts.role, userRole) : eq(accounts.userId, auth.userId)
-      );
+      .where(orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId));
 
     return ctx.json({ data });
   })
@@ -44,9 +40,7 @@ const app = new Hono()
     async (ctx) => {
       const auth = getAuth(ctx);
       const { id } = ctx.req.valid("param");
-      const userRole =
-        (auth?.sessionClaims as any)?.public_metadata?.role ??
-        (auth?.sessionClaims as any)?.publicMetadata?.role;
+      const orgId = (auth?.sessionClaims as any)?.org_id;
 
       if (!id) {
         return ctx.json({ error: "Missing id." }, 400);
@@ -66,7 +60,7 @@ const app = new Hono()
         .where(
           and(
             eq(accounts.id, id),
-            userRole ? eq(accounts.role, userRole) : eq(accounts.userId, auth.userId)
+            orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId)
           )
         );
 
@@ -89,6 +83,7 @@ const app = new Hono()
     ),
     async (ctx) => {
       const auth = getAuth(ctx);
+      const orgId = (auth?.sessionClaims as any)?.org_id;
       const values = ctx.req.valid("json");
       const userRole =
         (auth?.sessionClaims as any)?.public_metadata?.role ??
@@ -103,7 +98,7 @@ const app = new Hono()
         .values({
           id: createId(),
           userId: auth.userId,
-          role: userRole ?? "default",
+          orgId,
           ...values,
         })
         .returning();
@@ -122,6 +117,7 @@ const app = new Hono()
     ),
     async (ctx) => {
       const auth = getAuth(ctx);
+      const orgId = (auth?.sessionClaims as any)?.org_id;
       const values = ctx.req.valid("json");
 
       if (!auth?.userId) {
@@ -132,7 +128,7 @@ const app = new Hono()
         .delete(accounts)
         .where(
           and(
-            eq(accounts.userId, auth.userId),
+            (orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId)),
             inArray(accounts.id, values.ids)
           )
         )
@@ -162,6 +158,7 @@ const app = new Hono()
     async (ctx) => {
       const auth = getAuth(ctx);
       const { id } = ctx.req.valid("param");
+      const orgId = (auth?.sessionClaims as any)?.org_id;
       const values = ctx.req.valid("json");
 
       if (!id) {
@@ -175,7 +172,12 @@ const app = new Hono()
       const [data] = await db
         .update(accounts)
         .set(values)
-        .where(and(eq(accounts.userId, auth.userId), eq(accounts.id, id)))
+        .where(
+          and(
+            (orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId)),
+            eq(accounts.id, id)
+          )
+        )
         .returning();
 
       if (!data) {
@@ -197,6 +199,7 @@ const app = new Hono()
     async (ctx) => {
       const auth = getAuth(ctx);
       const { id } = ctx.req.valid("param");
+      const orgId = (auth?.sessionClaims as any)?.org_id;
 
       if (!id) {
         return ctx.json({ error: "Missing id." }, 400);
@@ -208,7 +211,12 @@ const app = new Hono()
 
       const [data] = await db
         .delete(accounts)
-        .where(and(eq(accounts.userId, auth.userId), eq(accounts.id, id)))
+        .where(
+          and(
+            (orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId)),
+            eq(accounts.id, id)
+          )
+        )
         .returning({
           id: accounts.id,
         });

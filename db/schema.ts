@@ -8,6 +8,7 @@ export const accounts = pgTable("accounts", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
   role: text("role").notNull().default("default"),
+  orgId: text("org_id"),
   userId: text("user_id").notNull(),
 });
 
@@ -17,11 +18,13 @@ export const accountsRelations = relations(accounts, ({ many }) => ({
 
 export const insertAccountSchema = createInsertSchema(accounts, {
   role: (schema) => schema.role.optional(),
+  orgId: (schema) => schema.orgId.optional(),
 });
 
 export const categories = pgTable("categories", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
+  orgId: text("org_id"),
   userId: text("user_id").notNull(),
 });
 
@@ -29,7 +32,9 @@ export const categoriesRelations = relations(categories, ({ many }) => ({
   transactions: many(transactions),
 }));
 
-export const insertCategorySchema = createInsertSchema(categories);
+export const insertCategorySchema = createInsertSchema(categories, {
+  orgId: (schema) => schema.orgId.optional(),
+});
 
 export const transactions = pgTable("transactions", {
   id: text("id").primaryKey(),

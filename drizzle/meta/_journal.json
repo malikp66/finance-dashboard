@@ -22,6 +22,13 @@
       "when": 1750335708098,
       "tag": "0002_add_role_to_accounts",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1750335708099,
+      "tag": "0003_add_org_id_to_tables",
+      "breakpoints": true
     }
   ]
 }
