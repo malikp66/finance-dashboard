@@ -20,6 +20,7 @@ const app = new Hono()
       .select({
         id: accounts.id,
         name: accounts.name,
+        role: accounts.role,
       })
       .from(accounts)
       .where(eq(accounts.userId, auth.userId));
@@ -51,6 +52,7 @@ const app = new Hono()
         .select({
           id: accounts.id,
           name: accounts.name,
+          role: accounts.role,
         })
         .from(accounts)
         .where(and(eq(accounts.userId, auth.userId), eq(accounts.id, id)));
@@ -69,6 +71,7 @@ const app = new Hono()
       "json",
       insertAccountSchema.pick({
         name: true,
+        role: true,
       })
     ),
     async (ctx) => {
@@ -136,6 +139,7 @@ const app = new Hono()
       "json",
       insertAccountSchema.pick({
         name: true,
+        role: true,
       })
     ),
     async (ctx) => {

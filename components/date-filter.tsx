@@ -1,6 +1,6 @@
 "use client";
 
-import { format, subDays } from "date-fns";
+import { format } from "date-fns";
 import { ChevronDown } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import qs from "query-string";
@@ -26,20 +26,17 @@ export const DateFilter = () => {
   const from = searchParams.get("from") || "";
   const to = searchParams.get("to") || "";
 
-  const defaultTo = new Date();
-  const defaultFrom = subDays(defaultTo, 30);
-
   const paramState = {
-    from: from ? new Date(from) : defaultFrom,
-    to: to ? new Date(to) : defaultTo,
+    from: from ? new Date(from) : undefined,
+    to: to ? new Date(to) : undefined,
   };
 
   const [date, setDate] = useState<DateRange | undefined>(paramState);
 
   const pushToUrl = (dateRange: DateRange | undefined) => {
     const query = {
-      from: format(dateRange?.from || defaultFrom, "yyyy-MM-dd"),
-      to: format(dateRange?.to || defaultTo, "yyyy-MM-dd"),
+      from: dateRange?.from ? format(dateRange.from, "yyyy-MM-dd") : undefined,
+      to: dateRange?.to ? format(dateRange.to, "yyyy-MM-dd") : undefined,
       accountId,
     };
 
