@@ -27,6 +27,9 @@ const app = new Hono().get(
     const { from, to, accountId, categoryId, companyMode } =
       ctx.req.valid("query");
     const isCompanyMode = companyMode === "true";
+    const userRole =
+      (auth?.sessionClaims as any)?.public_metadata?.role ??
+      (auth?.sessionClaims as any)?.publicMetadata?.role;
 
     if (!auth?.userId) {
       return ctx.json({ error: "Unauthorized." }, 401);
@@ -40,17 +43,11 @@ const app = new Hono().get(
       : defaultFrom;
     const endDate = to ? parse(to, "yyyy-MM-dd", new Date()) : defaultTo;
 
-    let accountRole: string | undefined;
-    if (accountId) {
-      const accRole = await db
-        .select({ role: accounts.role })
-        .from(accounts)
-        .where(
-          and(eq(accounts.id, accountId), eq(accounts.userId, auth.userId))
-        )
-        .limit(1);
-      accountRole = accRole[0]?.role;
-    }
+    const accountCondition = accountId
+      ? eq(transactions.accountId, accountId)
+      : userRole
+        ? eq(accounts.role, userRole)
+        : eq(accounts.userId, auth.userId);
 
     const periodLength = differenceInDays(endDate, startDate) + 1;
     const lastPeriodStart = subDays(startDate, periodLength);
@@ -99,11 +96,6 @@ const app = new Hono().get(
         .innerJoin(accounts, eq(transactions.accountId, accounts.id))
         .where(
           and(
-            accountRole
-              ? eq(accounts.role, accountRole)
-              : accountId
-                ? eq(transactions.accountId, accountId)
-                : undefined,
             categoryCondition,
             eq(accounts.userId, userId),
             gte(transactions.date, startDate),
@@ -130,11 +122,7 @@ const app = new Hono().get(
         .innerJoin(accounts, eq(transactions.accountId, accounts.id))
         .where(
           and(
-            accountRole
-              ? eq(accounts.role, accountRole)
-              : accountId
-                ? eq(transactions.accountId, accountId)
-                : undefined,
+            accountCondition,
             eq(transactions.categoryId, investmentCategoryId),
             eq(accounts.userId, userId),
             gte(transactions.date, startDate),
@@ -202,11 +190,7 @@ const app = new Hono().get(
       .innerJoin(categories, eq(transactions.categoryId, categories.id))
       .where(
         and(
-          accountRole
-            ? eq(accounts.role, accountRole)
-            : accountId
-              ? eq(transactions.accountId, accountId)
-              : undefined,
+          accountCondition,
           categoryId ? eq(transactions.categoryId, categoryId) : undefined,
           eq(accounts.userId, auth.userId),
           lt(transactions.amount, 0),
@@ -245,11 +229,7 @@ const app = new Hono().get(
       .innerJoin(accounts, eq(transactions.accountId, accounts.id))
       .where(
         and(
-          accountRole
-            ? eq(accounts.role, accountRole)
-            : accountId
-              ? eq(transactions.accountId, accountId)
-              : undefined,
+          accountCondition,
           isCompanyMode && !categoryId
             ? investmentCategoryId
               ? eq(transactions.categoryId, investmentCategoryId)

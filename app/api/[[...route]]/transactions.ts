@@ -30,6 +30,9 @@ const app = new Hono()
     async (ctx) => {
       const auth = getAuth(ctx);
       const { from, to, accountId, categoryId } = ctx.req.valid("query");
+      const userRole =
+        (auth?.sessionClaims as any)?.public_metadata?.role ??
+        (auth?.sessionClaims as any)?.publicMetadata?.role;
 
       if (!auth?.userId) {
         return ctx.json({ error: "Unauthorized." }, 401);
@@ -40,17 +43,11 @@ const app = new Hono()
         : undefined;
       const endDate = to ? parse(to, "yyyy-MM-dd", new Date()) : undefined;
 
-      let accountRole: string | undefined;
-      if (accountId) {
-        const accRole = await db
-          .select({ role: accounts.role })
-          .from(accounts)
-          .where(
-            and(eq(accounts.id, accountId), eq(accounts.userId, auth.userId))
-          )
-          .limit(1);
-        accountRole = accRole[0]?.role;
-      }
+      const accountCondition = accountId
+        ? eq(transactions.accountId, accountId)
+        : userRole
+          ? eq(accounts.role, userRole)
+          : eq(accounts.userId, auth.userId);
 
       const data = await db
         .select({
@@ -69,11 +66,7 @@ const app = new Hono()
         .leftJoin(categories, eq(transactions.categoryId, categories.id))
         .where(
           and(
-            accountRole
-              ? eq(accounts.role, accountRole)
-              : accountId
-                ? eq(transactions.accountId, accountId)
-                : undefined,
+            accountCondition,
             categoryId ? eq(transactions.categoryId, categoryId) : undefined,
             eq(accounts.userId, auth.userId),
             startDate ? gte(transactions.date, startDate) : undefined,

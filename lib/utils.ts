@@ -74,14 +74,14 @@ export function formatDateRange(period?: Period) {
   }
 
   if (period?.to) {
-    return `${format(new Date(period.from), "d MMM", { locale: id })} - ${format(
+    return `${format(new Date(period.from!), "d MMM", { locale: id })} - ${format(
       new Date(period.to),
       "d MMM yyyy",
       { locale: id }
     )}`;
   }
 
-  return format(new Date(period.from), "d MMM yyyy", { locale: id });
+  return format(new Date(period.from!), "d MMM yyyy", { locale: id });
 }
 
 export function formatPercentage(
