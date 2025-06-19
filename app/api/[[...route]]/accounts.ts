@@ -78,12 +78,16 @@ const app = new Hono()
       "json",
       insertAccountSchema.pick({
         name: true,
+        role: true,
       })
     ),
     async (ctx) => {
       const auth = getAuth(ctx);
       const orgId = (auth?.sessionClaims as any)?.org_id;
       const values = ctx.req.valid("json");
+      const userRole =
+        (auth?.sessionClaims as any)?.public_metadata?.role ??
+        (auth?.sessionClaims as any)?.publicMetadata?.role;
 
       if (!auth?.userId) {
         return ctx.json({ error: "Unauthorized." }, 401);
@@ -148,6 +152,7 @@ const app = new Hono()
       "json",
       insertAccountSchema.pick({
         name: true,
+        role: true,
       })
     ),
     async (ctx) => {

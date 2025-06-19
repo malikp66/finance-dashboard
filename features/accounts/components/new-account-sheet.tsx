@@ -15,6 +15,7 @@ import { AccountForm } from "./account-form";
 
 const formSchema = insertAccountSchema.pick({
   name: true,
+  role: true,
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -45,6 +46,7 @@ export const NewAccountSheet = () => {
         <AccountForm
           defaultValues={{
             name: "",
+            role: "default",
           }}
           onSubmit={onSubmit}
           disabled={mutation.isPending}
