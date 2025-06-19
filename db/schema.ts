@@ -7,6 +7,7 @@ import { bigint } from "drizzle-orm/pg-core";
 export const accounts = pgTable("accounts", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
+  role: text("role").notNull().default("default"),
   userId: text("user_id").notNull(),
 });
 
@@ -14,7 +15,9 @@ export const accountsRelations = relations(accounts, ({ many }) => ({
   transactions: many(transactions),
 }));
 
-export const insertAccountSchema = createInsertSchema(accounts);
+export const insertAccountSchema = createInsertSchema(accounts, {
+  role: (schema) => schema.role.optional(),
+});
 
 export const categories = pgTable("categories", {
   id: text("id").primaryKey(),
@@ -30,7 +33,7 @@ export const insertCategorySchema = createInsertSchema(categories);
 
 export const transactions = pgTable("transactions", {
   id: text("id").primaryKey(),
-  amount: bigint("amount", { mode: "number" }).notNull(), 
+  amount: bigint("amount", { mode: "number" }).notNull(),
   payee: text("payee").notNull(),
   notes: text("notes"),
   date: timestamp("date", { mode: "date" }).notNull(),
@@ -43,7 +46,6 @@ export const transactions = pgTable("transactions", {
     onDelete: "set null",
   }),
 });
-
 
 export const transactionsRelations = relations(transactions, ({ one }) => ({
   account: one(accounts, {

@@ -17,6 +17,7 @@ import { insertAccountSchema } from "@/db/schema";
 
 const formSchema = insertAccountSchema.pick({
   name: true,
+  role: true,
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -66,6 +67,23 @@ export const AccountForm = ({
 
               <FormControl>
                 <Input placeholder="e.g. Cash, Bank, Credit Card" {...field} />
+              </FormControl>
+
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          name="role"
+          control={form.control}
+          disabled={disabled}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Role</FormLabel>
+
+              <FormControl>
+                <Input placeholder="e.g. admin" {...field} />
               </FormControl>
 
               <FormMessage />

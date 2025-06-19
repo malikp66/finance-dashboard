@@ -1,7 +1,7 @@
 import { clerkMiddleware, getAuth } from "@hono/clerk-auth";
 import { zValidator } from "@hono/zod-validator";
 import { createId } from "@paralleldrive/cuid2";
-import { parse, subDays } from "date-fns";
+import { parse } from "date-fns";
 import { and, desc, eq, gte, inArray, lte, sql } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
@@ -35,13 +35,22 @@ const app = new Hono()
         return ctx.json({ error: "Unauthorized." }, 401);
       }
 
-      const defaultTo = new Date();
-      const defaultFrom = subDays(defaultTo, 30);
-
       const startDate = from
         ? parse(from, "yyyy-MM-dd", new Date())
-        : defaultFrom;
-      const endDate = to ? parse(to, "yyyy-MM-dd", new Date()) : defaultTo;
+        : undefined;
+      const endDate = to ? parse(to, "yyyy-MM-dd", new Date()) : undefined;
+
+      let accountRole: string | undefined;
+      if (accountId) {
+        const accRole = await db
+          .select({ role: accounts.role })
+          .from(accounts)
+          .where(
+            and(eq(accounts.id, accountId), eq(accounts.userId, auth.userId))
+          )
+          .limit(1);
+        accountRole = accRole[0]?.role;
+      }
 
       const data = await db
         .select({
@@ -60,11 +69,15 @@ const app = new Hono()
         .leftJoin(categories, eq(transactions.categoryId, categories.id))
         .where(
           and(
-            accountId ? eq(transactions.accountId, accountId) : undefined,
+            accountRole
+              ? eq(accounts.role, accountRole)
+              : accountId
+                ? eq(transactions.accountId, accountId)
+                : undefined,
             categoryId ? eq(transactions.categoryId, categoryId) : undefined,
             eq(accounts.userId, auth.userId),
-            gte(transactions.date, startDate),
-            lte(transactions.date, endDate)
+            startDate ? gte(transactions.date, startDate) : undefined,
+            endDate ? lte(transactions.date, endDate) : undefined
           )
         )
         .orderBy(desc(transactions.date));

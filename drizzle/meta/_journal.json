@@ -15,6 +15,13 @@
       "when": 1747905700824,
       "tag": "0001_aberrant_karma",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1750335708098,
+      "tag": "0002_add_role_to_accounts",
+      "breakpoints": true
     }
   ]
 }
