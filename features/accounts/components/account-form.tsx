@@ -13,6 +13,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Select } from "@/components/select";
 import { insertAccountSchema } from "@/db/schema";
 
 const formSchema = insertAccountSchema.pick({
@@ -63,10 +64,10 @@ export const AccountForm = ({
           disabled={disabled}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name</FormLabel>
+              <FormLabel>Nama</FormLabel>
 
               <FormControl>
-                <Input placeholder="e.g. Cash, Bank, Credit Card" {...field} />
+                <Input placeholder="cth. Kas, Bank, Kartu Kredit" {...field} />
               </FormControl>
 
               <FormMessage />
@@ -80,10 +81,20 @@ export const AccountForm = ({
           disabled={disabled}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Role</FormLabel>
+              <FormLabel>Peran</FormLabel>
 
               <FormControl>
-                <Input placeholder="e.g. admin" {...field} />
+                <Select
+                  placeholder="Pilih peran"
+                  options={[
+                    { label: "Sales", value: "Sales" },
+                    { label: "Balancing", value: "Balancing" },
+                    { label: "Investment", value: "Investment" },
+                  ]}
+                  value={field.value}
+                  onChange={field.onChange}
+                  disabled={disabled}
+                />
               </FormControl>
 
               <FormMessage />
@@ -92,7 +103,7 @@ export const AccountForm = ({
         />
 
         <Button className="w-full" disabled={disabled}>
-          {id ? "Save changes" : "Create account"}
+          {id ? "Simpan perubahan" : "Buat akun"}
         </Button>
 
         {!!id && (
@@ -104,7 +115,7 @@ export const AccountForm = ({
             variant="outline"
           >
             <Trash className="mr-2 size-4" />
-            Delete account
+            Hapus akun
           </Button>
         )}
       </form>

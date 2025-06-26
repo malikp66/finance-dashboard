@@ -51,17 +51,17 @@ const app = new Hono().get(
     const lastPeriodStart = subDays(startDate, periodLength);
     const lastPeriodEnd = subDays(endDate, periodLength);
 
-    const investmentCategory = await db
-      .select({ id: categories.id })
-      .from(categories)
+    const investmentAccount = await db
+      .select({ id: accounts.id })
+      .from(accounts)
       .where(
         and(
-          orgId ? eq(categories.orgId, orgId) : eq(categories.userId, auth.userId),
-          eq(categories.name, "Investasi")
+          orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId),
+          eq(accounts.name, "Investment")
         )
       )
       .limit(1);
-    const investmentCategoryId = investmentCategory[0]?.id;
+    const investmentAccountId = investmentAccount[0]?.id;
 
     async function fetchFinancialData(
       userId: string,
@@ -70,8 +70,8 @@ const app = new Hono().get(
     ) {
       const categoryCondition =
         isCompanyMode && !categoryId
-          ? investmentCategoryId
-            ? eq(transactions.categoryId, investmentCategoryId)
+          ? investmentAccountId
+            ? eq(transactions.accountId, investmentAccountId)
             : undefined
           : categoryId
             ? eq(transactions.categoryId, categoryId)
@@ -108,7 +108,7 @@ const app = new Hono().get(
       startDate: Date,
       endDate: Date
     ) {
-      if (!investmentCategoryId) return [{ investment: 0 }];
+      if (!investmentAccountId) return [{ investment: 0 }];
 
       return await db
         .select({
@@ -122,7 +122,7 @@ const app = new Hono().get(
         .where(
           and(
             accountCondition,
-            eq(transactions.categoryId, investmentCategoryId),
+            eq(transactions.accountId, investmentAccountId),
             orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, userId),
             gte(transactions.date, startDate),
             lte(transactions.date, endDate)
@@ -167,10 +167,10 @@ const app = new Hono().get(
       lastInvestment.investment
     );
 
-    const currentRemaining = investmentCategoryId
+    const currentRemaining = investmentAccountId
       ? currentInvestment.investment - currentPeriod.expenses
       : currentPeriod.remaining;
-    const lastRemaining = investmentCategoryId
+    const lastRemaining = investmentAccountId
       ? lastInvestment.investment - lastPeriod.expenses
       : lastPeriod.remaining;
 
@@ -230,8 +230,8 @@ const app = new Hono().get(
         and(
           accountCondition,
           isCompanyMode && !categoryId
-            ? investmentCategoryId
-              ? eq(transactions.categoryId, investmentCategoryId)
+            ? investmentAccountId
+              ? eq(transactions.accountId, investmentAccountId)
               : undefined
             : categoryId
               ? eq(transactions.categoryId, categoryId)
@@ -259,7 +259,7 @@ const app = new Hono().get(
         expensesChange,
         categories: finalCategories,
         days,
-        hasInvestmentCategory: Boolean(investmentCategoryId),
+        hasInvestmentCategory: Boolean(investmentAccountId),
       },
     });
   }

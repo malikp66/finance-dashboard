@@ -61,9 +61,9 @@ export const NewTransactionSheet = () => {
     <Sheet open={isOpen || isPending} onOpenChange={onClose}>
       <SheetContent className="space-y-4">
         <SheetHeader>
-          <SheetTitle>New Transaction</SheetTitle>
+          <SheetTitle>Transaksi Baru</SheetTitle>
 
-          <SheetDescription>Add a new transaction.</SheetDescription>
+          <SheetDescription>Tambah transaksi baru.</SheetDescription>
         </SheetHeader>
 
         {isLoading ? (

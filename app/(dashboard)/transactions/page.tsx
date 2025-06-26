@@ -57,7 +57,7 @@ const TransactionsPage = () => {
     const accountId = await confirm();
 
     if (!accountId) {
-      return toast.error("Please select an account to continue.");
+      return toast.error("Silakan pilih akun untuk melanjutkan.");
     }
 
     const data = values.map((value) => ({
@@ -111,9 +111,7 @@ const TransactionsPage = () => {
     <div className="mx-auto -mt-6 w-full max-w-screen-2xl pb-10">
       <Card className="border-none drop-shadow-sm">
         <CardHeader className="gap-y-2 lg:flex-row lg:items-center lg:justify-between">
-          <CardTitle className="line-clamp-1 text-xl">
-            Transaction History
-          </CardTitle>
+          <CardTitle className="line-clamp-1 text-xl">Riwayat Transaksi</CardTitle>
 
           <div className="flex flex-col items-center gap-x-2 gap-y-2 lg:flex-row">
             <Button
@@ -121,7 +119,7 @@ const TransactionsPage = () => {
               onClick={newTransaction.onOpen}
               className="w-full lg:w-auto"
             >
-              <Plus className="mr-2 size-4" /> Add new
+            <Plus className="mr-2 size-4" /> Tambah
             </Button>
 
             <UploadButton onUpload={onUpload} />

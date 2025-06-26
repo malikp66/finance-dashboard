@@ -45,7 +45,7 @@ export const DataGrid = () => {
     <div className={`mb-8 grid ${gridCols} gap-8 pb-2`}>
       {categoryName === "all" && (
         <DataCard
-          title="Balance"
+          title="Saldo"
           value={data?.remainingAmount}
           percentageChange={data?.remainingChange}
           icon={FaPiggyBank}
@@ -55,7 +55,7 @@ export const DataGrid = () => {
       )}
       {hasInvestment && categoryName === "all" && (
         <DataCard
-          title="Total Investment"
+          title="Total Investasi"
           value={data?.investmentAmount}
           percentageChange={data?.investmentChange}
           icon={FaCoins}
@@ -65,7 +65,7 @@ export const DataGrid = () => {
       )}
       {categoryName !== "all" && (
         <DataCard
-          title="Category Balance"
+          title="Saldo Kategori"
           value={data?.categoryBalance}
           icon={FaWallet}
           variant="warning"
@@ -74,7 +74,7 @@ export const DataGrid = () => {
       )}
       {categoryName === "Pribadi" && (
         <DataCard
-          title="Total Income"
+          title="Total Pemasukan"
           value={data?.incomeAmount}
           percentageChange={data?.incomeChange}
           icon={FaArrowTrendUp}
@@ -84,7 +84,7 @@ export const DataGrid = () => {
       )}
       {categoryName !== "Investasi" && (
         <DataCard
-          title="Total Expenses"
+          title="Total Pengeluaran"
           value={data?.expensesAmount}
           percentageChange={data?.expensesChange}
           icon={FaArrowTrendDown}

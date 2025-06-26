@@ -22,8 +22,8 @@ export const Actions = ({ id }: ActionsProps) => {
   const { onOpen } = useOpenCategory();
 
   const [ConfirmDialog, confirm] = useConfirm(
-    "Are you sure?",
-    "You are about to delete this category."
+    "Apakah Anda yakin?",
+    "Anda akan menghapus kategori ini."
   );
 
   const handleDelete = async () => {
@@ -50,7 +50,7 @@ export const Actions = ({ id }: ActionsProps) => {
             onClick={() => onOpen(id)}
           >
             <Edit className="mr-2 size-4" />
-            Edit
+            Ubah
           </DropdownMenuItem>
 
           <DropdownMenuItem
@@ -58,7 +58,7 @@ export const Actions = ({ id }: ActionsProps) => {
             onClick={handleDelete}
           >
             <Trash className="mr-2 size-4" />
-            Delete
+            Hapus
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
