@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const siteConfig: Metadata = {
   title: "Finance",
-  description: "Track your income and expenses with Finance.",
+  description: "Lacak pemasukan dan pengeluaran Anda dengan Finance.",
   keywords: [
     "reactjs",
     "nextjs",

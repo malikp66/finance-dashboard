@@ -22,12 +22,12 @@ export const useBulkDeleteAccounts = () => {
       return await response.json();
     },
     onSuccess: () => {
-      toast.success("Account(s) deleted.");
+      toast.success("Akun berhasil dihapus.");
       queryClient.invalidateQueries({ queryKey: ["accounts"] });
       queryClient.invalidateQueries({ queryKey: ["summary"] });
     },
     onError: () => {
-      toast.error("Failed to delete account(s).");
+      toast.error("Gagal menghapus akun.");
     },
   });
 
