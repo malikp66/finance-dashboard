@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { siteConfig } from "@/config";
 import { QueryProviders } from "@/providers/query-provider";
 import { SheetProvider } from "@/providers/sheet-provider";
+import { OrganizationQueryListener } from "@/providers/organization-query-listener";
 
 import "./globals.css";
 
@@ -21,6 +22,7 @@ const RootLayout = ({ children }: Readonly<PropsWithChildren>) => {
       <html lang="en">
         <body className="font-sans">
           <QueryProviders>
+            <OrganizationQueryListener />
             <SheetProvider />
             <Toaster richColors theme="light" />
 
