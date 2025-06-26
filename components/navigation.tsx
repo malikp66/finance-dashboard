@@ -13,19 +13,19 @@ import { NavButton } from "./nav-button";
 const routes = [
   {
     href: "/",
-    label: "Overview",
+    label: "Ikhtisar",
   },
   {
     href: "/transactions",
-    label: "Transactions",
+    label: "Transaksi",
   },
   {
     href: "/accounts",
-    label: "Accounts",
+    label: "Akun",
   },
   {
     href: "/categories",
-    label: "Categories",
+    label: "Kategori",
   },
 ];
 

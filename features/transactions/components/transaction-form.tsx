@@ -114,7 +114,7 @@ export const TransactionForm = ({
 
               <FormControl>
                 <Select
-                  placeholder="Select an account"
+                  placeholder="Pilih akun"
                   options={accountOptions}
                   onCreate={onCreateAccount}
                   value={field.value}
@@ -138,7 +138,7 @@ export const TransactionForm = ({
 
               <FormControl>
                 <Select
-                  placeholder="Select a category"
+                  placeholder="Pilih kategori"
                   options={categoryOptions}
                   onCreate={onCreateCategory}
                   value={field.value}
@@ -179,7 +179,7 @@ export const TransactionForm = ({
           disabled={disabled}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Amount</FormLabel>
+              <FormLabel>Jumlah</FormLabel>
 
               <FormControl>
                 <AmountInput
@@ -200,14 +200,14 @@ export const TransactionForm = ({
           disabled={disabled}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Notes</FormLabel>
+              <FormLabel>Catatan</FormLabel>
 
               <FormControl>
                 <Textarea
                   {...field}
                   value={field.value || ""}
                   disabled={disabled}
-                  placeholder="Optional notes..."
+                  placeholder="Catatan opsional..."
                 />
               </FormControl>
 
@@ -217,7 +217,7 @@ export const TransactionForm = ({
         />
 
         <Button className="w-full" disabled={disabled}>
-          {id ? "Save changes" : "Create transaction"}
+          {id ? "Simpan perubahan" : "Buat transaksi"}
         </Button>
 
         {!!id && (
@@ -229,7 +229,7 @@ export const TransactionForm = ({
             variant="outline"
           >
             <Trash className="mr-2 size-4" />
-            Delete transaction
+            Hapus transaksi
           </Button>
         )}
       </form>
