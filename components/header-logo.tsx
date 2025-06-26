@@ -5,7 +5,7 @@ import { useOrganization } from "@clerk/nextjs";
 
 export const HeaderLogo = () => {
   const { organization } = useOrganization();
-  const orgName = organization?.name ?? "MYZ Finance";
+  const orgName = organization?.name ?? "";
 
   return (
     <Link href="/">
