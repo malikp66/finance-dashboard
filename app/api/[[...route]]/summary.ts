@@ -29,7 +29,7 @@ const app = new Hono().get(
     const isCompanyMode = companyMode === "true";
     const orgId = auth?.orgId;
 
-    if (!auth?.userId) {
+    if (!auth?.userId || !orgId) {
       return ctx.json({ error: "Unauthorized." }, 401);
     }
 
@@ -41,8 +41,7 @@ const app = new Hono().get(
       : defaultFrom;
     const endDate = to ? parse(to, "yyyy-MM-dd", new Date()) : defaultTo;
 
-    const userOrgCondition =
-      orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId);
+    const userOrgCondition = eq(accounts.orgId, orgId);
 
     const accountCondition = accountId
       ? eq(transactions.accountId, accountId)
@@ -56,16 +55,19 @@ const app = new Hono().get(
       .select({ id: accounts.id })
       .from(accounts)
       .where(
-        and(
-          orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId),
-          eq(accounts.role, "Investment")
-        )
+        and(eq(accounts.orgId, orgId), eq(accounts.role, "Investment"))
       )
       .limit(1);
     const investmentAccountId = investmentAccount[0]?.id;
 
+    const investmentCategory = await db
+      .select({ id: categories.id })
+      .from(categories)
+      .where(and(eq(categories.orgId, orgId), eq(categories.name, "Investasi")))
+      .limit(1);
+    const investmentCategoryId = investmentCategory[0]?.id;
+
     async function fetchFinancialData(
-      userId: string,
       startDate: Date,
       endDate: Date
     ) {
@@ -97,7 +99,7 @@ const app = new Hono().get(
           and(
             accountCondition,
             categoryCondition,
-            orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, userId),
+            eq(accounts.orgId, orgId),
             gte(transactions.date, startDate),
             lte(transactions.date, endDate)
           )
@@ -105,11 +107,10 @@ const app = new Hono().get(
     }
 
     async function fetchInvestmentAmount(
-      userId: string,
       startDate: Date,
       endDate: Date
     ) {
-      if (!investmentAccountId) return [{ investment: 0 }];
+      if (!investmentCategoryId) return [{ investment: 0 }];
 
       return await db
         .select({
@@ -122,8 +123,8 @@ const app = new Hono().get(
         .innerJoin(accounts, eq(transactions.accountId, accounts.id))
         .where(
           and(
-            eq(transactions.accountId, investmentAccountId),
-            userOrgCondition,
+            eq(transactions.categoryId, investmentCategoryId),
+            eq(accounts.orgId, orgId),
             gte(transactions.date, startDate),
             lte(transactions.date, endDate)
           )
@@ -131,23 +132,19 @@ const app = new Hono().get(
     }
 
     const [currentPeriod] = await fetchFinancialData(
-      auth.userId,
       startDate,
       endDate
     );
     const [lastPeriod] = await fetchFinancialData(
-      auth.userId,
       lastPeriodStart,
       lastPeriodEnd
     );
 
     const [currentInvestment] = await fetchInvestmentAmount(
-      auth.userId,
       startDate,
       endDate
     );
     const [lastInvestment] = await fetchInvestmentAmount(
-      auth.userId,
       lastPeriodStart,
       lastPeriodEnd
     );
@@ -191,7 +188,7 @@ const app = new Hono().get(
         and(
           accountCondition,
           categoryId ? eq(transactions.categoryId, categoryId) : undefined,
-          orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId),
+          eq(accounts.orgId, orgId),
           lt(transactions.amount, 0),
           gte(transactions.date, startDate),
           lte(transactions.date, endDate)
@@ -236,7 +233,7 @@ const app = new Hono().get(
             : categoryId
               ? eq(transactions.categoryId, categoryId)
               : undefined,
-          orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId),
+          eq(accounts.orgId, orgId),
           gte(transactions.date, startDate),
           lte(transactions.date, endDate)
         )
@@ -259,7 +256,8 @@ const app = new Hono().get(
         expensesChange,
         categories: finalCategories,
         days,
-        hasInvestmentCategory: Boolean(investmentAccountId),
+        hasInvestmentCategory: Boolean(investmentCategoryId),
+        hasInvestmentAccount: Boolean(investmentAccountId),
       },
     });
   }

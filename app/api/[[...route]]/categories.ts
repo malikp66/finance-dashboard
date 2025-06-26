@@ -13,7 +13,7 @@ const app = new Hono()
     const auth = getAuth(ctx);
     const orgId = auth?.orgId;
 
-    if (!auth?.userId) {
+    if (!auth?.userId || !orgId) {
       return ctx.json({ error: "Unauthorized." }, 401);
     }
 
@@ -23,7 +23,7 @@ const app = new Hono()
         name: categories.name,
       })
       .from(categories)
-      .where(orgId ? eq(categories.orgId, orgId) : eq(categories.userId, auth.userId));
+      .where(eq(categories.orgId, orgId));
 
     return ctx.json({ data });
   })
@@ -55,12 +55,7 @@ const app = new Hono()
           name: categories.name,
         })
         .from(categories)
-        .where(
-          and(
-            eq(categories.id, id),
-            orgId ? eq(categories.orgId, orgId) : eq(categories.userId, auth.userId)
-          )
-        );
+        .where(and(eq(categories.id, id), eq(categories.orgId, orgId)));
 
       if (!data) {
         return ctx.json({ error: "Not found." }, 404);
@@ -120,12 +115,7 @@ const app = new Hono()
 
       const data = await db
         .delete(categories)
-        .where(
-          and(
-            orgId ? eq(categories.orgId, orgId) : eq(categories.userId, auth.userId),
-            inArray(categories.id, values.ids)
-          )
-        )
+        .where(and(eq(categories.orgId, orgId), inArray(categories.id, values.ids)))
         .returning({
           id: categories.id,
         });
@@ -165,12 +155,7 @@ const app = new Hono()
       const [data] = await db
         .update(categories)
         .set(values)
-        .where(
-          and(
-            (orgId ? eq(categories.orgId, orgId) : eq(categories.userId, auth.userId)),
-            eq(categories.id, id)
-          )
-        )
+        .where(and(eq(categories.orgId, orgId), eq(categories.id, id)))
         .returning();
 
       if (!data) {
@@ -204,12 +189,7 @@ const app = new Hono()
 
       const [data] = await db
         .delete(categories)
-        .where(
-          and(
-            (orgId ? eq(categories.orgId, orgId) : eq(categories.userId, auth.userId)),
-            eq(categories.id, id)
-          )
-        )
+        .where(and(eq(categories.orgId, orgId), eq(categories.id, id)))
         .returning({
           id: categories.id,
         });

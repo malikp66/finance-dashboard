@@ -32,7 +32,7 @@ const app = new Hono()
       const { from, to, accountId, categoryId } = ctx.req.valid("query");
       const orgId = auth?.orgId;
 
-      if (!auth?.userId) {
+      if (!auth?.userId || !orgId) {
         return ctx.json({ error: "Unauthorized." }, 401);
       }
 
@@ -66,7 +66,7 @@ const app = new Hono()
           and(
             accountCondition,
             categoryId ? eq(transactions.categoryId, categoryId) : undefined,
-            orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId),
+            eq(accounts.orgId, orgId),
             startDate ? gte(transactions.date, startDate) : undefined,
             endDate ? lte(transactions.date, endDate) : undefined
           )
@@ -94,7 +94,7 @@ const app = new Hono()
         return ctx.json({ error: "Missing id." }, 400);
       }
 
-      if (!auth?.userId) {
+      if (!auth?.userId || !orgId) {
         return ctx.json({ error: "Unauthorized." }, 401);
       }
 
@@ -110,12 +110,7 @@ const app = new Hono()
         })
         .from(transactions)
         .innerJoin(accounts, eq(transactions.accountId, accounts.id))
-        .where(
-          and(
-            eq(transactions.id, id),
-            orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId)
-          )
-        );
+        .where(and(eq(transactions.id, id), eq(accounts.orgId, orgId)));
 
       if (!data) {
         return ctx.json({ error: "Not found." }, 404);
@@ -138,7 +133,7 @@ const app = new Hono()
       const values = ctx.req.valid("json");
       const orgId = auth?.orgId;
 
-      if (!auth?.userId) {
+      if (!auth?.userId || !orgId) {
         return ctx.json({ error: "Unauthorized." }, 401);
       }
 
@@ -160,8 +155,9 @@ const app = new Hono()
     async (ctx) => {
       const auth = getAuth(ctx);
       const values = ctx.req.valid("json");
+      const orgId = auth?.orgId;
 
-      if (!auth?.userId) {
+      if (!auth?.userId || !orgId) {
         return ctx.json({ error: "Unauthorized." }, 401);
       }
 
@@ -190,9 +186,9 @@ const app = new Hono()
     async (ctx) => {
       const auth = getAuth(ctx);
       const values = ctx.req.valid("json");
-        const orgId = auth?.orgId;
+      const orgId = auth?.orgId;
 
-      if (!auth?.userId) {
+      if (!auth?.userId || !orgId) {
         return ctx.json({ error: "Unauthorized." }, 401);
       }
 
@@ -204,7 +200,7 @@ const app = new Hono()
           .where(
             and(
               inArray(transactions.id, values.ids),
-              orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId)
+              eq(accounts.orgId, orgId)
             )
           )
       );
@@ -250,7 +246,7 @@ const app = new Hono()
         return ctx.json({ error: "Missing id." }, 400);
       }
 
-      if (!auth?.userId) {
+      if (!auth?.userId || !orgId) {
         return ctx.json({ error: "Unauthorized." }, 401);
       }
 
@@ -260,10 +256,7 @@ const app = new Hono()
           .from(transactions)
           .innerJoin(accounts, eq(transactions.accountId, accounts.id))
           .where(
-            and(
-              eq(transactions.id, id),
-              orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId)
-            )
+            and(eq(transactions.id, id), eq(accounts.orgId, orgId))
           )
       );
 
@@ -298,13 +291,13 @@ const app = new Hono()
     async (ctx) => {
       const auth = getAuth(ctx);
       const { id } = ctx.req.valid("param");
-        const orgId = auth?.orgId;
+      const orgId = auth?.orgId;
 
       if (!id) {
         return ctx.json({ error: "Missing id." }, 400);
       }
 
-      if (!auth?.userId) {
+      if (!auth?.userId || !orgId) {
         return ctx.json({ error: "Unauthorized." }, 401);
       }
 
@@ -313,12 +306,7 @@ const app = new Hono()
           .select({ id: transactions.id })
           .from(transactions)
           .innerJoin(accounts, eq(transactions.accountId, accounts.id))
-          .where(
-            and(
-              eq(transactions.id, id),
-              orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId)
-            )
-          )
+          .where(and(eq(transactions.id, id), eq(accounts.orgId, orgId)))
       );
 
       const [data] = await db

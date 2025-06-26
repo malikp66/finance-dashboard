@@ -16,11 +16,12 @@ export const DataGrid = () => {
   const from = searchParams.get("from") || undefined;
   const categoryId = searchParams.get("categoryId") || "all";
   const categoryName = searchParams.get("categoryName") || "all";
-  const hasInvestment = data?.hasInvestmentCategory;
+  const hasInvestmentCategory = data?.hasInvestmentCategory;
+  const hasInvestmentAccount = data?.hasInvestmentAccount;
 
   let cardCount = 0;
   if (categoryName === "all") cardCount++; // Balance
-  if (hasInvestment && categoryName === "all") cardCount++; // Total Investment
+  if (hasInvestmentCategory && categoryName === "all") cardCount++; // Total Investment
   if (categoryName !== "all") cardCount++; // Category Balance
   if (categoryName === "Pribadi") cardCount++; // Total Income
   if (categoryName !== "Investasi") cardCount++; // Total Expenses
@@ -45,7 +46,7 @@ export const DataGrid = () => {
     <div className={`mb-8 grid ${gridCols} gap-8 pb-2`}>
       {categoryName === "all" && (
         <DataCard
-          title="Saldo"
+          title={hasInvestmentAccount ? "Sisa Saldo Investasi" : "Saldo"}
           value={data?.remainingAmount}
           percentageChange={data?.remainingChange}
           icon={FaPiggyBank}
@@ -53,7 +54,7 @@ export const DataGrid = () => {
           dateRange={dateRangeLabel}
         />
       )}
-      {hasInvestment && categoryName === "all" && (
+      {hasInvestmentCategory && categoryName === "all" && (
         <DataCard
           title="Total Investasi"
           value={data?.investmentAmount}
