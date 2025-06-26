@@ -57,14 +57,14 @@ export const useSelectAccount = (): [
     <Dialog open={promise !== null} onOpenChange={handleCancel}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Select Account</DialogTitle>
+          <DialogTitle>Pilih Akun</DialogTitle>
           <DialogDescription>
-            Please select an account to continue.
+            Silakan pilih akun untuk melanjutkan.
           </DialogDescription>
         </DialogHeader>
 
         <Select
-          placeholder="Select an account"
+          placeholder="Pilih akun"
           options={accountOptions}
           onCreate={onCreateAccount}
           onChange={(value) => (selectValue.current = value)}

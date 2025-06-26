@@ -33,24 +33,24 @@ export const NewAccountSheet = () => {
   };
 
   return (
-    <Sheet open={isOpen || mutation.isPending} onOpenChange={onClose}>
-      <SheetContent className="space-y-4">
-        <SheetHeader>
-          <SheetTitle>New Account</SheetTitle>
+      <Sheet open={isOpen || mutation.isPending} onOpenChange={onClose}>
+        <SheetContent className="space-y-4">
+          <SheetHeader>
+            <SheetTitle>Akun Baru</SheetTitle>
 
-          <SheetDescription>
-            Create a new account to track your transactions.
-          </SheetDescription>
-        </SheetHeader>
+            <SheetDescription>
+              Buat akun baru untuk melacak transaksi Anda.
+            </SheetDescription>
+          </SheetHeader>
 
-        <AccountForm
-          defaultValues={{
-            name: "",
-            role: "default",
-          }}
-          onSubmit={onSubmit}
-          disabled={mutation.isPending}
-        />
+          <AccountForm
+            defaultValues={{
+              name: "",
+              role: "Sales",
+            }}
+            onSubmit={onSubmit}
+            disabled={mutation.isPending}
+          />
       </SheetContent>
     </Sheet>
   );

@@ -29,8 +29,8 @@ export const EditTransactionSheet = () => {
   const { isOpen, onClose, id } = useOpenTransaction();
 
   const [ConfirmDialog, confirm] = useConfirm(
-    "Are you sure?",
-    "You are about to delete this transaction."
+    "Apakah Anda yakin?",
+    "Anda akan menghapus transaksi ini."
   );
 
   const transactionQuery = useGetTransaction(id);
@@ -112,9 +112,9 @@ export const EditTransactionSheet = () => {
       <Sheet open={isOpen || isPending} onOpenChange={onClose}>
         <SheetContent className="space-y-4">
           <SheetHeader>
-            <SheetTitle>Edit Transaction</SheetTitle>
+            <SheetTitle>Edit Transaksi</SheetTitle>
 
-            <SheetDescription>Edit an existing transaction.</SheetDescription>
+            <SheetDescription>Edit transaksi yang sudah ada.</SheetDescription>
           </SheetHeader>
 
           {isLoading ? (
