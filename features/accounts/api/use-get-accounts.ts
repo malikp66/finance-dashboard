@@ -1,10 +1,16 @@
+"use client";
+
 import { useQuery } from "@tanstack/react-query";
 
 import { client } from "@/lib/hono";
+import { useOrganization } from "@clerk/nextjs";
 
 export const useGetAccounts = () => {
+  const { organization } = useOrganization();
+  const orgId = organization?.id;
+
   const query = useQuery({
-    queryKey: ["accounts"],
+    queryKey: ["accounts", orgId],
     queryFn: async () => {
       const response = await client.api.accounts.$get();
 
