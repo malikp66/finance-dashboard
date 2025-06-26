@@ -1,10 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
+import { useOrganization } from "@clerk/nextjs";
 
 import { client } from "@/lib/hono";
 import { convertAmountFromMilliunits } from "@/lib/utils";
 
 export const useGetTransactions = () => {
+  const { organization } = useOrganization();
+  const orgId = organization?.id;
   const searchParams = useSearchParams();
   const from = searchParams.get("from") || "";
   const to = searchParams.get("to") || "";
@@ -12,7 +15,7 @@ export const useGetTransactions = () => {
   const categoryId = searchParams.get("categoryId") || "";
 
   const query = useQuery({
-    queryKey: ["transactions", { from, to, accountId, categoryId }],
+    queryKey: ["transactions", orgId, { from, to, accountId, categoryId }],
     queryFn: async () => {
       const response = await client.api.transactions.$get({
         query: {
