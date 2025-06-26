@@ -13,7 +13,7 @@ import { NavButton } from "./nav-button";
 const routes = [
   {
     href: "/",
-    label: "Ikhtisar",
+    label: "Laporan",
   },
   {
     href: "/transactions",
