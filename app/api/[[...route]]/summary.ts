@@ -41,11 +41,12 @@ const app = new Hono().get(
       : defaultFrom;
     const endDate = to ? parse(to, "yyyy-MM-dd", new Date()) : defaultTo;
 
+    const userOrgCondition =
+      orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId);
+
     const accountCondition = accountId
       ? eq(transactions.accountId, accountId)
-      : orgId
-        ? eq(accounts.orgId, orgId)
-        : eq(accounts.userId, auth.userId);
+      : userOrgCondition;
 
     const periodLength = differenceInDays(endDate, startDate) + 1;
     const lastPeriodStart = subDays(startDate, periodLength);
@@ -57,7 +58,7 @@ const app = new Hono().get(
       .where(
         and(
           orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId),
-          eq(accounts.name, "Investment")
+          eq(accounts.role, "Investment")
         )
       )
       .limit(1);
@@ -121,9 +122,8 @@ const app = new Hono().get(
         .innerJoin(accounts, eq(transactions.accountId, accounts.id))
         .where(
           and(
-            accountCondition,
             eq(transactions.accountId, investmentAccountId),
-            orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, userId),
+            userOrgCondition,
             gte(transactions.date, startDate),
             lte(transactions.date, endDate)
           )

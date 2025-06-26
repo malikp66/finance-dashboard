@@ -17,9 +17,11 @@ export const Header = () => {
             <Navigation />
           </div>
 
-          <div className="flex items-center gap-x-2">
+          <div className="flex items-center gap-x-5">
             <ClerkLoaded>
-              <OrganizationSwitcher />
+              <div className="rounded-3xl p-1 bg-white">
+                <OrganizationSwitcher />
+              </div>
             </ClerkLoaded>
             <ClerkLoaded>
               <UserButton afterSignOutUrl="/" />
