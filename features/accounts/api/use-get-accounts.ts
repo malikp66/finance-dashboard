@@ -8,7 +8,7 @@ export const useGetAccounts = () => {
     queryFn: async () => {
       const response = await client.api.accounts.$get();
 
-      if (!response.ok) throw new Error("Failed to fetch accounts.");
+      if (!response.ok) throw new Error("Gagal mengambil akun.");
 
       const { data } = await response.json();
 

@@ -22,12 +22,12 @@ export const useBulkDeleteTransactions = () => {
       return await response.json();
     },
     onSuccess: () => {
-      toast.success("Transaction(s) deleted.");
+      toast.success("Transaksi berhasil dihapus.");
       queryClient.invalidateQueries({ queryKey: ["transactions"] });
       queryClient.invalidateQueries({ queryKey: ["summary"] });
     },
     onError: () => {
-      toast.error("Failed to delete transaction(s).");
+      toast.error("Gagal menghapus transaksi.");
     },
   });
 

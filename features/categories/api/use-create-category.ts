@@ -17,11 +17,11 @@ export const useCreateCategory = () => {
       return await response.json();
     },
     onSuccess: () => {
-      toast.success("Category created.");
+      toast.success("Kategori berhasil dibuat.");
       queryClient.invalidateQueries({ queryKey: ["categories"] });
     },
     onError: () => {
-      toast.error("Failed to create category.");
+      toast.error("Gagal membuat kategori.");
     },
   });
 

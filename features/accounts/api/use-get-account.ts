@@ -11,7 +11,7 @@ export const useGetAccount = (id?: string) => {
         param: { id },
       });
 
-      if (!response.ok) throw new Error("Failed to fetch account.");
+      if (!response.ok) throw new Error("Gagal mengambil akun.");
 
       const { data } = await response.json();
 

@@ -87,9 +87,9 @@ export const AccountForm = ({
                 <Select
                   placeholder="Pilih peran"
                   options={[
-                    { label: "Sales", value: "Sales" },
-                    { label: "Balancing", value: "Balancing" },
-                    { label: "Investment", value: "Investment" },
+                    { label: "Penjualan", value: "Sales" },
+                    { label: "Penyeimbang", value: "Balancing" },
+                    { label: "Investasi", value: "Investment" },
                   ]}
                   value={field.value}
                   onChange={field.onChange}
