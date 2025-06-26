@@ -13,7 +13,7 @@ const app = new Hono()
     const auth = getAuth(ctx);
     const orgId = auth?.orgId;
 
-    if (!auth?.userId || !orgId) {
+    if (!auth?.userId) {
       return ctx.json({ error: "Unauthorized." }, 401);
     }
 
@@ -24,7 +24,7 @@ const app = new Hono()
         role: accounts.role,
       })
       .from(accounts)
-      .where(eq(accounts.orgId, orgId));
+      .where(orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId));
 
     return ctx.json({ data });
   })
@@ -58,7 +58,10 @@ const app = new Hono()
         })
         .from(accounts)
         .where(
-          and(eq(accounts.id, id), eq(accounts.orgId, orgId))
+          and(
+            eq(accounts.id, id),
+            orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId)
+          )
         );
 
       if (!data) {
@@ -123,7 +126,12 @@ const app = new Hono()
 
       const data = await db
         .delete(accounts)
-        .where(and(eq(accounts.orgId, orgId), inArray(accounts.id, values.ids)))
+        .where(
+          and(
+            orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId),
+            inArray(accounts.id, values.ids)
+          )
+        )
         .returning({
           id: accounts.id,
         });
@@ -164,7 +172,12 @@ const app = new Hono()
       const [data] = await db
         .update(accounts)
         .set(values)
-        .where(and(eq(accounts.orgId, orgId), eq(accounts.id, id)))
+        .where(
+          and(
+            orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId),
+            eq(accounts.id, id)
+          )
+        )
         .returning();
 
       if (!data) {
@@ -198,7 +211,12 @@ const app = new Hono()
 
       const [data] = await db
         .delete(accounts)
-        .where(and(eq(accounts.orgId, orgId), eq(accounts.id, id)))
+        .where(
+          and(
+            orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId),
+            eq(accounts.id, id)
+          )
+        )
         .returning({
           id: accounts.id,
         });

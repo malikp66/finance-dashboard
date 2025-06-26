@@ -29,7 +29,7 @@ const app = new Hono().get(
     const isCompanyMode = companyMode === "true";
     const orgId = auth?.orgId;
 
-    if (!auth?.userId || !orgId) {
+    if (!auth?.userId) {
       return ctx.json({ error: "Unauthorized." }, 401);
     }
 
@@ -41,7 +41,8 @@ const app = new Hono().get(
       : defaultFrom;
     const endDate = to ? parse(to, "yyyy-MM-dd", new Date()) : defaultTo;
 
-    const userOrgCondition = eq(accounts.orgId, orgId);
+    const userOrgCondition =
+      orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId);
 
     const accountCondition = accountId
       ? eq(transactions.accountId, accountId)
@@ -55,7 +56,10 @@ const app = new Hono().get(
       .select({ id: accounts.id })
       .from(accounts)
       .where(
-        and(eq(accounts.orgId, orgId), eq(accounts.role, "Investment"))
+        and(
+          orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId),
+          eq(accounts.role, "Investment")
+        )
       )
       .limit(1);
     const investmentAccountId = investmentAccount[0]?.id;
@@ -63,7 +67,12 @@ const app = new Hono().get(
     const investmentCategory = await db
       .select({ id: categories.id })
       .from(categories)
-      .where(and(eq(categories.orgId, orgId), eq(categories.name, "Investasi")))
+      .where(
+        and(
+          orgId ? eq(categories.orgId, orgId) : eq(categories.userId, auth.userId),
+          eq(categories.name, "Investasi")
+        )
+      )
       .limit(1);
     const investmentCategoryId = investmentCategory[0]?.id;
 
@@ -99,7 +108,7 @@ const app = new Hono().get(
           and(
             accountCondition,
             categoryCondition,
-            eq(accounts.orgId, orgId),
+            userOrgCondition,
             gte(transactions.date, startDate),
             lte(transactions.date, endDate)
           )
@@ -124,7 +133,7 @@ const app = new Hono().get(
         .where(
           and(
             eq(transactions.categoryId, investmentCategoryId),
-            eq(accounts.orgId, orgId),
+            userOrgCondition,
             gte(transactions.date, startDate),
             lte(transactions.date, endDate)
           )
@@ -188,7 +197,7 @@ const app = new Hono().get(
         and(
           accountCondition,
           categoryId ? eq(transactions.categoryId, categoryId) : undefined,
-          eq(accounts.orgId, orgId),
+          userOrgCondition,
           lt(transactions.amount, 0),
           gte(transactions.date, startDate),
           lte(transactions.date, endDate)
@@ -233,7 +242,7 @@ const app = new Hono().get(
             : categoryId
               ? eq(transactions.categoryId, categoryId)
               : undefined,
-          eq(accounts.orgId, orgId),
+          userOrgCondition,
           gte(transactions.date, startDate),
           lte(transactions.date, endDate)
         )
