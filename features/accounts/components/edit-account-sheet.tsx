@@ -28,8 +28,8 @@ export const EditAccountSheet = () => {
   const { isOpen, onClose, id } = useOpenAccount();
 
   const [ConfirmDialog, confirm] = useConfirm(
-    "Are you sure?",
-    "You are about to delete this account."
+    "Apakah Anda yakin?",
+    "Anda akan menghapus akun ini."
   );
 
   const accountQuery = useGetAccount(id);
@@ -49,14 +49,14 @@ export const EditAccountSheet = () => {
   };
 
   const defaultValues = accountQuery.data
-    ? {
-        name: accountQuery.data.name,
-        role: accountQuery.data.role,
-      }
-    : {
-        name: "",
-        role: "default",
-      };
+      ? {
+          name: accountQuery.data.name,
+          role: accountQuery.data.role,
+        }
+      : {
+          name: "",
+          role: "Sales",
+        };
 
   const onDelete = async () => {
     const ok = await confirm();
@@ -76,9 +76,9 @@ export const EditAccountSheet = () => {
       <Sheet open={isOpen || isPending} onOpenChange={onClose}>
         <SheetContent className="space-y-4">
           <SheetHeader>
-            <SheetTitle>Edit Account</SheetTitle>
+            <SheetTitle>Edit Akun</SheetTitle>
 
-            <SheetDescription>Edit an existing account.</SheetDescription>
+            <SheetDescription>Edit akun yang sudah ada.</SheetDescription>
           </SheetHeader>
 
           {isLoading ? (

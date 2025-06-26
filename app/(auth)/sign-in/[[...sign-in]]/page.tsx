@@ -7,9 +7,9 @@ const SignInPage = () => {
     <div className="grid min-h-screen grid-cols-1 lg:grid-cols-2">
       <div className="h-full flex-col items-center justify-center px-4 lg:flex">
         <div className="space-y-4 pt-16 text-center">
-          <h1 className="text-3xl font-bold text-[#2E2A47]">Welcome back!</h1>
+          <h1 className="text-3xl font-bold text-[#2E2A47]">Selamat datang kembali!</h1>
           <p className="text-base text-[#7E8CA0]">
-            Log in or create account to get back to your dashboard.
+            Masuk atau buat akun untuk kembali ke dashboard Anda.
           </p>
         </div>
 

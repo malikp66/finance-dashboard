@@ -50,6 +50,20 @@
       "when": 1750346706677,
       "tag": "0006_regular_ink",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1750346706678,
+      "tag": "0007_fix_orgid_columns",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1750346706679,
+      "tag": "0008_add_missing_columns",
+      "breakpoints": true
     }
   ]
 }

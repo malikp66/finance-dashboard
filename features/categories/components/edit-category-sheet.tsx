@@ -27,8 +27,8 @@ export const EditCategorySheet = () => {
   const { isOpen, onClose, id } = useOpenCategory();
 
   const [ConfirmDialog, confirm] = useConfirm(
-    "Are you sure?",
-    "You are about to delete this category."
+    "Apakah Anda yakin?",
+    "Anda akan menghapus kategori ini."
   );
 
   const categoryQuery = useGetCategory(id);
@@ -73,9 +73,9 @@ export const EditCategorySheet = () => {
       <Sheet open={isOpen || isPending} onOpenChange={onClose}>
         <SheetContent className="space-y-4">
           <SheetHeader>
-            <SheetTitle>Edit Category</SheetTitle>
+            <SheetTitle>Edit Kategori</SheetTitle>
 
-            <SheetDescription>Edit an existing category.</SheetDescription>
+            <SheetDescription>Edit kategori yang sudah ada.</SheetDescription>
           </SheetHeader>
 
           {isLoading ? (
