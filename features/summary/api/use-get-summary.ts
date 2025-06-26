@@ -1,10 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
+import { useOrganization } from "@clerk/nextjs";
 
 import { client } from "@/lib/hono";
 import { convertAmountFromMilliunits } from "@/lib/utils";
 
 export const useGetSummary = () => {
+  const { organization } = useOrganization();
+  const orgId = organization?.id;
   const searchParams = useSearchParams();
   const from = searchParams.get("from") || "";
   const to = searchParams.get("to") || "";
@@ -13,7 +16,7 @@ export const useGetSummary = () => {
   const companyMode = searchParams.get("companyMode") || "";
 
   const query = useQuery({
-    queryKey: ["summary", { from, to, accountId, categoryId, companyMode }],
+    queryKey: ["summary", orgId, { from, to, accountId, categoryId, companyMode }],
     queryFn: async () => {
       const response = await client.api.summary.$get({
         query: {
