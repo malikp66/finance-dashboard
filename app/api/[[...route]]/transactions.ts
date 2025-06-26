@@ -41,11 +41,12 @@ const app = new Hono()
         : undefined;
       const endDate = to ? parse(to, "yyyy-MM-dd", new Date()) : undefined;
 
+      const userOrgCondition =
+        orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId);
+
       const accountCondition = accountId
         ? eq(transactions.accountId, accountId)
-        : orgId
-          ? eq(accounts.orgId, orgId)
-          : eq(accounts.userId, auth.userId);
+        : userOrgCondition;
 
       const data = await db
         .select({
@@ -66,7 +67,7 @@ const app = new Hono()
           and(
             accountCondition,
             categoryId ? eq(transactions.categoryId, categoryId) : undefined,
-            orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId),
+            userOrgCondition,
             startDate ? gte(transactions.date, startDate) : undefined,
             endDate ? lte(transactions.date, endDate) : undefined
           )
@@ -160,6 +161,7 @@ const app = new Hono()
     async (ctx) => {
       const auth = getAuth(ctx);
       const values = ctx.req.valid("json");
+      const orgId = auth?.orgId;
 
       if (!auth?.userId) {
         return ctx.json({ error: "Unauthorized." }, 401);
@@ -190,11 +192,14 @@ const app = new Hono()
     async (ctx) => {
       const auth = getAuth(ctx);
       const values = ctx.req.valid("json");
-        const orgId = auth?.orgId;
+      const orgId = auth?.orgId;
 
       if (!auth?.userId) {
         return ctx.json({ error: "Unauthorized." }, 401);
       }
+
+      const userOrgCondition =
+        orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId);
 
       const transactionsToDelete = db.$with("transactions_to_delete").as(
         db
@@ -204,7 +209,7 @@ const app = new Hono()
           .where(
             and(
               inArray(transactions.id, values.ids),
-              orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId)
+              userOrgCondition
             )
           )
       );
@@ -254,17 +259,15 @@ const app = new Hono()
         return ctx.json({ error: "Unauthorized." }, 401);
       }
 
+      const userOrgCondition =
+        orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId);
+
       const transactionsToUpdate = db.$with("transactions_to_update").as(
         db
           .select({ id: transactions.id })
           .from(transactions)
           .innerJoin(accounts, eq(transactions.accountId, accounts.id))
-          .where(
-            and(
-              eq(transactions.id, id),
-              orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId)
-            )
-          )
+          .where(and(eq(transactions.id, id), userOrgCondition))
       );
 
       const [data] = await db
@@ -298,7 +301,7 @@ const app = new Hono()
     async (ctx) => {
       const auth = getAuth(ctx);
       const { id } = ctx.req.valid("param");
-        const orgId = auth?.orgId;
+      const orgId = auth?.orgId;
 
       if (!id) {
         return ctx.json({ error: "Missing id." }, 400);
@@ -308,17 +311,15 @@ const app = new Hono()
         return ctx.json({ error: "Unauthorized." }, 401);
       }
 
+      const userOrgCondition =
+        orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId);
+
       const transactionsToDelete = db.$with("transactions_to_delete").as(
         db
           .select({ id: transactions.id })
           .from(transactions)
           .innerJoin(accounts, eq(transactions.accountId, accounts.id))
-          .where(
-            and(
-              eq(transactions.id, id),
-              orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId)
-            )
-          )
+          .where(and(eq(transactions.id, id), userOrgCondition))
       );
 
       const [data] = await db

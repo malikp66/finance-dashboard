@@ -23,7 +23,9 @@ const app = new Hono()
         name: categories.name,
       })
       .from(categories)
-      .where(orgId ? eq(categories.orgId, orgId) : eq(categories.userId, auth.userId));
+      .where(
+        orgId ? eq(categories.orgId, orgId) : eq(categories.userId, auth.userId)
+      );
 
     return ctx.json({ data });
   })
@@ -167,7 +169,7 @@ const app = new Hono()
         .set(values)
         .where(
           and(
-            (orgId ? eq(categories.orgId, orgId) : eq(categories.userId, auth.userId)),
+            orgId ? eq(categories.orgId, orgId) : eq(categories.userId, auth.userId),
             eq(categories.id, id)
           )
         )
@@ -206,7 +208,7 @@ const app = new Hono()
         .delete(categories)
         .where(
           and(
-            (orgId ? eq(categories.orgId, orgId) : eq(categories.userId, auth.userId)),
+            orgId ? eq(categories.orgId, orgId) : eq(categories.userId, auth.userId),
             eq(categories.id, id)
           )
         )

@@ -64,8 +64,19 @@ const app = new Hono().get(
       .limit(1);
     const investmentAccountId = investmentAccount[0]?.id;
 
+    const investmentCategory = await db
+      .select({ id: categories.id })
+      .from(categories)
+      .where(
+        and(
+          orgId ? eq(categories.orgId, orgId) : eq(categories.userId, auth.userId),
+          eq(categories.name, "Investasi")
+        )
+      )
+      .limit(1);
+    const investmentCategoryId = investmentCategory[0]?.id;
+
     async function fetchFinancialData(
-      userId: string,
       startDate: Date,
       endDate: Date
     ) {
@@ -97,7 +108,7 @@ const app = new Hono().get(
           and(
             accountCondition,
             categoryCondition,
-            orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, userId),
+            userOrgCondition,
             gte(transactions.date, startDate),
             lte(transactions.date, endDate)
           )
@@ -105,11 +116,10 @@ const app = new Hono().get(
     }
 
     async function fetchInvestmentAmount(
-      userId: string,
       startDate: Date,
       endDate: Date
     ) {
-      if (!investmentAccountId) return [{ investment: 0 }];
+      if (!investmentCategoryId) return [{ investment: 0 }];
 
       return await db
         .select({
@@ -122,7 +132,7 @@ const app = new Hono().get(
         .innerJoin(accounts, eq(transactions.accountId, accounts.id))
         .where(
           and(
-            eq(transactions.accountId, investmentAccountId),
+            eq(transactions.categoryId, investmentCategoryId),
             userOrgCondition,
             gte(transactions.date, startDate),
             lte(transactions.date, endDate)
@@ -131,23 +141,19 @@ const app = new Hono().get(
     }
 
     const [currentPeriod] = await fetchFinancialData(
-      auth.userId,
       startDate,
       endDate
     );
     const [lastPeriod] = await fetchFinancialData(
-      auth.userId,
       lastPeriodStart,
       lastPeriodEnd
     );
 
     const [currentInvestment] = await fetchInvestmentAmount(
-      auth.userId,
       startDate,
       endDate
     );
     const [lastInvestment] = await fetchInvestmentAmount(
-      auth.userId,
       lastPeriodStart,
       lastPeriodEnd
     );
@@ -191,7 +197,7 @@ const app = new Hono().get(
         and(
           accountCondition,
           categoryId ? eq(transactions.categoryId, categoryId) : undefined,
-          orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId),
+          userOrgCondition,
           lt(transactions.amount, 0),
           gte(transactions.date, startDate),
           lte(transactions.date, endDate)
@@ -236,7 +242,7 @@ const app = new Hono().get(
             : categoryId
               ? eq(transactions.categoryId, categoryId)
               : undefined,
-          orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId),
+          userOrgCondition,
           gte(transactions.date, startDate),
           lte(transactions.date, endDate)
         )
@@ -259,7 +265,8 @@ const app = new Hono().get(
         expensesChange,
         categories: finalCategories,
         days,
-        hasInvestmentCategory: Boolean(investmentAccountId),
+        hasInvestmentCategory: Boolean(investmentCategoryId),
+        hasInvestmentAccount: Boolean(investmentAccountId),
       },
     });
   }

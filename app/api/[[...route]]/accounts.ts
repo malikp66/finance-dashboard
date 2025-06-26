@@ -12,7 +12,6 @@ const app = new Hono()
   .get("/", clerkMiddleware(), async (ctx) => {
     const auth = getAuth(ctx);
     const orgId = auth?.orgId;
-    console.log('auth org: ', orgId)
 
     if (!auth?.userId) {
       return ctx.json({ error: "Unauthorized." }, 401);
@@ -129,7 +128,7 @@ const app = new Hono()
         .delete(accounts)
         .where(
           and(
-            (orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId)),
+            orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId),
             inArray(accounts.id, values.ids)
           )
         )
@@ -175,7 +174,7 @@ const app = new Hono()
         .set(values)
         .where(
           and(
-            (orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId)),
+            orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId),
             eq(accounts.id, id)
           )
         )
@@ -214,7 +213,7 @@ const app = new Hono()
         .delete(accounts)
         .where(
           and(
-            (orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId)),
+            orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId),
             eq(accounts.id, id)
           )
         )
