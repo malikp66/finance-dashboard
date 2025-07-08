@@ -183,6 +183,85 @@ Once the script completes, check your database to ensure that the transaction da
 
 **NOTE:** Please make sure to keep your API keys and configuration values secure and do not expose them publicly.
 
+## :bookmark_tabs: Dokumentasi API
+
+Semua endpoint berada di bawah prefix `/api`. Pastikan variabel `NEXT_PUBLIC_APP_URL` pada `.env.local` mengarah ke URL aplikasi Anda. Seluruh route dilindungi oleh Clerk sehingga setiap permintaan harus menyertakan token autentikasi yang valid.
+
+### Accounts
+
+- `GET /api/accounts` - Mendapatkan daftar akun milik pengguna.
+- `GET /api/accounts/:id` - Detail akun tertentu.
+- `POST /api/accounts` - Membuat akun baru dengan body JSON:
+
+  ```json
+  {
+    "name": "Akun A",
+    "role": "Investment"
+  }
+  ```
+- `PATCH /api/accounts/:id` - Mengubah data akun.
+- `DELETE /api/accounts/:id` - Menghapus akun.
+- `POST /api/accounts/bulk-delete` - Menghapus banyak akun secara bersamaan dengan body:
+
+  ```json
+  { "ids": ["id1", "id2"] }
+  ```
+
+### Categories
+
+- `GET /api/categories` - Melihat daftar kategori.
+- `GET /api/categories/:id` - Detail kategori tertentu.
+- `POST /api/categories` - Membuat kategori baru dengan body JSON:
+
+  ```json
+  { "name": "Makan" }
+  ```
+- `PATCH /api/categories/:id` - Mengubah kategori.
+- `DELETE /api/categories/:id` - Menghapus kategori.
+- `POST /api/categories/bulk-delete` - Menghapus banyak kategori dengan body:
+
+  ```json
+  { "ids": ["id1", "id2"] }
+  ```
+
+### Transactions
+
+- `GET /api/transactions` - Parameter query opsional: `from`, `to`, `accountId`, dan `categoryId`.
+- `GET /api/transactions/:id` - Detail transaksi.
+- `POST /api/transactions` - Membuat transaksi baru dengan body JSON:
+
+  ```json
+  {
+    "accountId": "acc1",
+    "categoryId": "cat1",
+    "amount": 100000,
+    "payee": "Contoh",
+    "date": "2024-01-01",
+    "notes": "optional"
+  }
+  ```
+- `PATCH /api/transactions/:id` - Mengubah transaksi.
+- `DELETE /api/transactions/:id` - Menghapus transaksi.
+- `POST /api/transactions/bulk-create` - Membuat banyak transaksi sekaligus.
+- `POST /api/transactions/bulk-delete` - Menghapus banyak transaksi dengan body:
+
+  ```json
+  { "ids": ["id1", "id2"] }
+  ```
+
+### Summary
+
+- `GET /api/summary` - Parameter query opsional: `from`, `to`, `accountId`, `categoryId`, dan `companyMode`. Endpoint ini mengembalikan ringkasan pemasukan dan pengeluaran.
+
+### User Role
+
+- `GET /api/role` - Mendapatkan peran pengguna saat ini.
+- `PATCH /api/role` - Memperbarui peran dengan body JSON:
+
+  ```json
+  { "role": "admin" }
+  ```
+
 ## :camera: Screenshots
 
 ![Modern UI/UX](/.github/images/img1.png "Modern UI/UX")
