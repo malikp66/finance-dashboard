@@ -189,7 +189,8 @@ Once the script completes, check your database to ensure that the transaction da
 ## :bookmark_tabs: Dokumentasi API
 
 Semua endpoint berada di bawah prefix `/api`. Pastikan variabel `NEXT_PUBLIC_APP_URL` pada `.env.local` mengarah ke URL aplikasi Anda. Seluruh route dilindungi oleh Clerk sehingga setiap permintaan harus menyertakan token autentikasi yang valid.
-Untuk dua endpoint transaksi (`GET /api/transactions` dan `GET /api/transactions/:id`) tersedia akses publik menggunakan token khusus. Set `API_PUBLIC_TOKEN` di berkas `.env.local` dan kirimkan nilainya pada header `x-api-token` atau `Authorization: Bearer <token>` saat melakukan request.
+Untuk tiga endpoint transaksi (`GET /api/transactions`, `GET /api/transactions/:id`, dan `POST /api/transactions`) tersedia akses publik menggunakan token khusus. Set `API_PUBLIC_TOKEN` di berkas `.env.local` dan kirimkan nilainya pada header `x-api-token` atau `Authorization: Bearer <token>` saat melakukan request.
+
 
 ### Accounts
 

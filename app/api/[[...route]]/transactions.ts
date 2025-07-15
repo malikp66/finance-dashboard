@@ -150,7 +150,7 @@ const app = new Hono()
   )
   .post(
     "/",
-    clerkMiddleware(),
+    publicTokenAuth,
     zValidator(
       "json",
       insertTransactionSchema.omit({
@@ -159,10 +159,11 @@ const app = new Hono()
     ),
     async (ctx) => {
       const auth = getAuth(ctx);
+      const isPublic = ctx.get("isPublic" as never) as boolean | undefined;
       const values = ctx.req.valid("json");
       const orgId = auth?.orgId;
 
-      if (!auth?.userId) {
+      if (!isPublic && !auth?.userId) {
         return ctx.json({ error: "Unauthorized." }, 401);
       }
 
