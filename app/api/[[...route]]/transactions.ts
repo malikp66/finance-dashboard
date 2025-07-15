@@ -17,13 +17,15 @@ import {
 const clerkMw = clerkMiddleware();
 
 const publicTokenAuth: MiddlewareHandler = async (c, next) => {
-  const token = c.req.header("x-api-token");
+  const tokenHeader = c.req.header("x-api-token") ?? c.req.header("authorization");
+  const token = tokenHeader?.replace(/^Bearer\s+/i, "");
+
   if (token && token === process.env.API_PUBLIC_TOKEN) {
     c.set("isPublic", true);
-    await next();
-  } else {
-    await clerkMw(c, next);
+    return next();
   }
+
+  return clerkMw(c, next);
 };
 
 const app = new Hono()
