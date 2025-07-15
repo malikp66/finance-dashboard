@@ -8,6 +8,9 @@ declare global {
 
       // app base url
       NEXT_PUBLIC_APP_URL: string;
+
+      // public api token
+      API_PUBLIC_TOKEN: string;
     }
   }
 }
