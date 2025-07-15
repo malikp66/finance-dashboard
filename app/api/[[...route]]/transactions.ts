@@ -3,7 +3,7 @@ import { zValidator } from "@hono/zod-validator";
 import { createId } from "@paralleldrive/cuid2";
 import { parse } from "date-fns";
 import { and, desc, eq, gte, inArray, lte, sql } from "drizzle-orm";
-import { Hono } from "hono";
+import { Hono, type MiddlewareHandler } from "hono";
 import { z } from "zod";
 
 import { db } from "@/db/drizzle";
@@ -13,6 +13,20 @@ import {
   insertTransactionSchema,
   transactions,
 } from "@/db/schema";
+
+const clerkMw = clerkMiddleware();
+
+const publicTokenAuth: MiddlewareHandler = async (c, next) => {
+  const tokenHeader = c.req.header("x-api-token") ?? c.req.header("authorization");
+  const token = tokenHeader?.replace(/^Bearer\s+/i, "");
+
+  if (token && token === process.env.API_PUBLIC_TOKEN) {
+    c.set("isPublic", true);
+    return next();
+  }
+
+  return clerkMw(c, next);
+};
 
 const app = new Hono()
   .get(
@@ -26,13 +40,14 @@ const app = new Hono()
         categoryId: z.string().optional(),
       })
     ),
-    clerkMiddleware(),
+    publicTokenAuth,
     async (ctx) => {
       const auth = getAuth(ctx);
+      const isPublic = ctx.get("isPublic" as never) as boolean | undefined;
       const { from, to, accountId, categoryId } = ctx.req.valid("query");
       const orgId = auth?.orgId;
 
-      if (!auth?.userId) {
+      if (!isPublic && !auth?.userId) {
         return ctx.json({ error: "Unauthorized." }, 401);
       }
 
@@ -41,8 +56,11 @@ const app = new Hono()
         : undefined;
       const endDate = to ? parse(to, "yyyy-MM-dd", new Date()) : undefined;
 
-      const userOrgCondition =
-        orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId);
+      const userOrgCondition = isPublic
+        ? undefined
+        : orgId
+        ? eq(accounts.orgId, orgId)
+        : eq(accounts.userId, auth!.userId as string);
 
       const accountCondition = accountId
         ? eq(transactions.accountId, accountId)
@@ -85,9 +103,10 @@ const app = new Hono()
         id: z.string().optional(),
       })
     ),
-    clerkMiddleware(),
+    publicTokenAuth,
     async (ctx) => {
       const auth = getAuth(ctx);
+      const isPublic = ctx.get("isPublic" as never) as boolean | undefined;
       const { id } = ctx.req.valid("param");
       const orgId = auth?.orgId;
 
@@ -95,7 +114,7 @@ const app = new Hono()
         return ctx.json({ error: "Missing id." }, 400);
       }
 
-      if (!auth?.userId) {
+      if (!isPublic && !auth?.userId) {
         return ctx.json({ error: "Unauthorized." }, 401);
       }
 
@@ -114,7 +133,11 @@ const app = new Hono()
         .where(
           and(
             eq(transactions.id, id),
-            orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId)
+            isPublic
+              ? undefined
+              : orgId
+              ? eq(accounts.orgId, orgId)
+              : eq(accounts.userId, auth!.userId as string)
           )
         );
 
