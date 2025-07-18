@@ -44,6 +44,10 @@ export const useGetSummary = () => {
         categoryBalance: convertAmountFromMilliunits(data.categoryBalance),
         hasInvestmentCategory: data.hasInvestmentCategory,
         hasInvestmentAccount: data.hasInvestmentAccount,
+        salesAmount: convertAmountFromMilliunits(data.salesAmount ?? 0),
+        salesChange: data.salesChange,
+        hasSalesCategory: data.hasSalesCategory,
+        accountRole: data.accountRole,
         categories: data.categories.map((category) => ({
           ...category,
           value: convertAmountFromMilliunits(category.value),

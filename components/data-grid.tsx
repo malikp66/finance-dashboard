@@ -18,13 +18,20 @@ export const DataGrid = () => {
   const categoryName = searchParams.get("categoryName") || "all";
   const hasInvestmentCategory = data?.hasInvestmentCategory;
   const hasInvestmentAccount = data?.hasInvestmentAccount;
+  const hasSalesCategory = data?.hasSalesCategory;
+  const accountRole = data?.accountRole;
 
   let cardCount = 0;
-  if (categoryName === "all") cardCount++; // Balance
-  if (hasInvestmentCategory && categoryName === "all") cardCount++; // Total Investment
-  if (categoryName !== "all") cardCount++; // Category Balance
-  if (categoryName === "Pribadi") cardCount++; // Total Income
-  if (categoryName !== "Investasi") cardCount++; // Total Expenses
+  if (accountRole === "Sales") {
+    cardCount = hasSalesCategory ? 1 : 0;
+  } else {
+    if (categoryName === "all") cardCount++; // Balance
+    if (hasInvestmentCategory && categoryName === "all") cardCount++; // Total Investment
+    if (hasSalesCategory && categoryName === "all" && accountRole !== "Investment") cardCount++; // Total Sales
+    if (categoryName !== "all") cardCount++; // Category Balance
+    if (categoryName === "Pribadi") cardCount++; // Total Income
+    if (categoryName !== "Investasi") cardCount++; // Total Expenses
+  }
 
 
   // Atur grid cols sesuai jumlah card
@@ -44,7 +51,7 @@ export const DataGrid = () => {
 
   return (
     <div className={`mb-8 grid ${gridCols} gap-8 pb-2`}>
-      {categoryName === "all" && (
+      {categoryName === "all" && accountRole !== "Sales" && (
         <DataCard
           title={hasInvestmentAccount ? "Sisa Saldo Investasi" : "Saldo"}
           value={data?.remainingAmount}
@@ -54,7 +61,7 @@ export const DataGrid = () => {
           dateRange={dateRangeLabel}
         />
       )}
-      {hasInvestmentCategory && categoryName === "all" && (
+      {hasInvestmentCategory && categoryName === "all" && accountRole !== "Sales" && (
         <DataCard
           title="Total Investasi"
           value={data?.investmentAmount}
@@ -64,7 +71,17 @@ export const DataGrid = () => {
           dateRange={dateRangeLabel}
         />
       )}
-      {categoryName !== "all" && (
+      {hasSalesCategory && categoryName === "all" && accountRole !== "Investment" && (
+        <DataCard
+          title="Total Penjualan"
+          value={data?.salesAmount}
+          percentageChange={data?.salesChange}
+          icon={FaArrowTrendUp}
+          variant="success"
+          dateRange={dateRangeLabel}
+        />
+      )}
+      {categoryName !== "all" && accountRole !== "Sales" && (
         <DataCard
           title="Saldo Kategori"
           value={data?.categoryBalance}
@@ -73,7 +90,7 @@ export const DataGrid = () => {
           dateRange={dateRangeLabel}
         />
       )}
-      {categoryName === "Pribadi" && (
+      {categoryName === "Pribadi" && accountRole !== "Sales" && (
         <DataCard
           title="Total Pemasukan"
           value={data?.incomeAmount}
@@ -83,7 +100,7 @@ export const DataGrid = () => {
           dateRange={dateRangeLabel}
         />
       )}
-      {categoryName !== "Investasi" && (
+      {categoryName !== "Investasi" && accountRole !== "Sales" && (
         <DataCard
           title="Total Pengeluaran"
           value={data?.expensesAmount}
