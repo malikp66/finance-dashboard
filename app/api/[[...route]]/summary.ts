@@ -48,6 +48,15 @@ const app = new Hono().get(
       ? eq(transactions.accountId, accountId)
       : userOrgCondition;
 
+    const selectedAccount = accountId
+      ? await db
+          .select({ role: accounts.role })
+          .from(accounts)
+          .where(eq(accounts.id, accountId))
+          .limit(1)
+      : [];
+    const selectedAccountRole = selectedAccount[0]?.role ?? null;
+
     const periodLength = differenceInDays(endDate, startDate) + 1;
     const lastPeriodStart = subDays(startDate, periodLength);
     const lastPeriodEnd = subDays(endDate, periodLength);
@@ -64,6 +73,18 @@ const app = new Hono().get(
       .limit(1);
     const investmentAccountId = investmentAccount[0]?.id;
 
+    const salesAccount = await db
+      .select({ id: accounts.id })
+      .from(accounts)
+      .where(
+        and(
+          orgId ? eq(accounts.orgId, orgId) : eq(accounts.userId, auth.userId),
+          eq(accounts.role, "Sales")
+        )
+      )
+      .limit(1);
+    const salesAccountId = salesAccount[0]?.id;
+
     const investmentCategory = await db
       .select({ id: categories.id })
       .from(categories)
@@ -75,6 +96,18 @@ const app = new Hono().get(
       )
       .limit(1);
     const investmentCategoryId = investmentCategory[0]?.id;
+
+    const salesCategory = await db
+      .select({ id: categories.id })
+      .from(categories)
+      .where(
+        and(
+          orgId ? eq(categories.orgId, orgId) : eq(categories.userId, auth.userId),
+          eq(categories.name, "Penjualan")
+        )
+      )
+      .limit(1);
+    const salesCategoryId = salesCategory[0]?.id;
 
     async function fetchFinancialData(
       startDate: Date,
@@ -140,6 +173,28 @@ const app = new Hono().get(
         );
     }
 
+    async function fetchSalesAmount(startDate: Date, endDate: Date) {
+      if (!salesCategoryId) return [{ sales: 0 }];
+
+      return await db
+        .select({
+          sales:
+            sql`SUM(CASE WHEN ${transactions.amount} >= 0 THEN ${transactions.amount} ELSE 0 END)`.mapWith(
+              Number
+            ),
+        })
+        .from(transactions)
+        .innerJoin(accounts, eq(transactions.accountId, accounts.id))
+        .where(
+          and(
+            eq(transactions.categoryId, salesCategoryId),
+            userOrgCondition,
+            gte(transactions.date, startDate),
+            lte(transactions.date, endDate)
+          )
+        );
+    }
+
     const [currentPeriod] = await fetchFinancialData(
       startDate,
       endDate
@@ -158,6 +213,9 @@ const app = new Hono().get(
       lastPeriodEnd
     );
 
+    const [currentSales] = await fetchSalesAmount(startDate, endDate);
+    const [lastSales] = await fetchSalesAmount(lastPeriodStart, lastPeriodEnd);
+
     const incomeChange = calculatePercentageChange(
       currentPeriod.income,
       lastPeriod.income
@@ -171,6 +229,11 @@ const app = new Hono().get(
     const investmentChange = calculatePercentageChange(
       currentInvestment.investment,
       lastInvestment.investment
+    );
+
+    const salesChange = calculatePercentageChange(
+      currentSales.sales,
+      lastSales.sales
     );
 
     const currentRemaining = investmentAccountId
@@ -267,6 +330,10 @@ const app = new Hono().get(
         days,
         hasInvestmentCategory: Boolean(investmentCategoryId),
         hasInvestmentAccount: Boolean(investmentAccountId),
+        salesAmount: currentSales.sales,
+        salesChange,
+        hasSalesCategory: Boolean(salesCategoryId),
+        accountRole: selectedAccountRole,
       },
     });
   }
