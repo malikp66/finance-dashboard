@@ -11,7 +11,7 @@ import { formatPercentage } from "@/lib/utils";
 
 import { CategoryTooltip } from "./category-tooltip";
 
-const COLORS = ["#0062FF", "#12C6FF", "#FF647F", "#FF9354"];
+const COLORS = ["#FFD700", "#ffffff", "#000000", "#FFD700"];
 
 type PieVariantProps = {
   data: {
