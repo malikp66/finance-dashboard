@@ -44,14 +44,14 @@ export const LineVariant = ({ data }: LineVariantProps) => {
         <Line
           dot={false}
           dataKey="income"
-          stroke="#FFD700"
+          stroke="#3d82f6"
           strokeWidth={2}
           className="drop-shadow-sm"
         />
         <Line
           dot={false}
           dataKey="expenses"
-          stroke="#ffffff"
+          stroke="#f43f5e"
           strokeWidth={2}
           className="drop-shadow-sm"
         />

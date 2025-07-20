@@ -29,7 +29,7 @@ export const CategoryTooltip = ({ active, payload }: CategoryTooltipProps) => {
       <div className="space-y-1 p-2 px-3">
         <div className="flex items-center justify-between gap-x-4">
           <div className="flex items-center gap-x-2">
-            <div className="size-1.5 rounded-full bg-white" aria-hidden />
+            <div className="size-1.5 rounded-full bg-rose-500" aria-hidden />
 
             <p className="text-sm text-muted-foreground">Expenses</p>
           </div>
