@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const siteConfig: Metadata = {
-  title: "Finance",
-  description: "Lacak pemasukan dan pengeluaran Anda dengan Finance.",
+  title: "Business Dashboard",
+  description: "Lacak pemasukan dan pengeluaran Anda dengan Business Dashboard.",
   keywords: [
     "reactjs",
     "nextjs",
@@ -15,7 +15,7 @@ export const siteConfig: Metadata = {
     "radix-ui",
     "cn",
     "clsx",
-    "finance-app",
+    "business-dashboard",
     "transactions",
     "dashboard",
     "accounts",

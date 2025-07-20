@@ -1,4 +1,4 @@
-# Code of Conduct - Finance
+# Code of Conduct - Business Dashboard
 
 ## Our Pledge
 
