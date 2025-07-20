@@ -1,6 +1,7 @@
 import { SignUp, ClerkLoaded, ClerkLoading } from "@clerk/nextjs";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
+import { Card, CardContent } from "@/components/ui/card";
 
 const SignUpPage = () => {
   return (
@@ -14,18 +15,22 @@ const SignUpPage = () => {
         </div>
 
         <div className="mt-8 flex items-center justify-center">
-          <ClerkLoaded>
-            <SignUp path="/sign-up" />
-          </ClerkLoaded>
+          <Card className="w-full max-w-md">
+            <CardContent className="pt-6">
+              <ClerkLoaded>
+                <SignUp path="/sign-up" />
+              </ClerkLoaded>
 
-          <ClerkLoading>
-            <Loader2 className="animate-spin text-muted-foreground" />
-          </ClerkLoading>
+              <ClerkLoading>
+                <Loader2 className="animate-spin text-muted-foreground" />
+              </ClerkLoading>
+            </CardContent>
+          </Card>
         </div>
       </div>
 
       <div className="hidden h-full items-center justify-center bg-blue-600 lg:flex">
-        <Image src="/logo.svg" alt="Finance logo" height={100} width={100} />
+        <Image src="/logo.svg" alt="Business logo" height={100} width={100} />
       </div>
     </div>
   );

@@ -10,7 +10,7 @@ export const HeaderLogo = () => {
   return (
     <Link href="/">
       <div className="hidden items-center lg:flex">
-        <p className="ml-2.5 text-2xl capitalize font-semibold text-white">{orgName} Finance</p>
+        <p className="ml-2.5 text-2xl capitalize font-semibold text-white">{orgName} Business</p>
       </div>
     </Link>
   );

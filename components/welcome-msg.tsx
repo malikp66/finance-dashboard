@@ -12,7 +12,7 @@ export const WelcomeMsg = () => {
         {user?.username} 👋
       </h2>
       <p className="text-sm text-[#89B6FD] lg:text-base">
-        Ini adalah ringkasan laporan keuangan Anda.
+        Ini adalah ringkasan laporan bisnis Anda.
       </p>
     </div>
   );

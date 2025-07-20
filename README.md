@@ -1,8 +1,8 @@
 <a name="readme-top"></a>
 
-# Track your income and expenses with Finance.
+# Manage your business with Business Dashboard.
 
-![Track your income and expenses with Finance.](/.github/images/img_main.png "Track your income and expenses with Finance.")
+![Manage your business with Business Dashboard.](/.github/images/img_main.png "Manage your business with Business Dashboard.")
 
 [![Ask Me Anything!](https://flat.badgen.net/static/Ask%20me/anything?icon=github&color=black&scale=1.01)](https://github.com/sanidhyy "Ask Me Anything!")
 [![GitHub license](https://flat.badgen.net/github/license/sanidhyy/finance-dashboard?icon=github&color=black&scale=1.01)](https://github.com/sanidhyy/finance-dashboard/blob/main/LICENSE "GitHub license")
@@ -281,7 +281,7 @@ Untuk tiga endpoint transaksi (`GET /api/transactions`, `GET /api/transactions/:
 
 ## :wrench: Stats
 
-[![Stats for Finance](/.github/images/stats.svg "Stats for Finance")](https://pagespeed.web.dev/analysis?url=https://appfinance.vercel.app/ "Stats for Finance")
+[![Stats for Business Dashboard](/.github/images/stats.svg "Stats for Business Dashboard")](https://pagespeed.web.dev/analysis?url=https://appfinance.vercel.app/ "Stats for Business Dashboard")
 
 ## :raised_hands: Contribute
 
@@ -289,7 +289,7 @@ You might encounter some bugs while using this app. You are more than welcome to
 
 ## :gem: Acknowledgements
 
-Useful resources and dependencies that are used in Finance.
+Useful resources and dependencies that are used in Business Dashboard.
 
 - Thanks to CodeWithAntonio: https://codewithantonio.com/
 - [@clerk/backend](https://www.npmjs.com/package/@clerk/backend): ^1.1.3
